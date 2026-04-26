@@ -12,7 +12,6 @@ export const authApi = axios.create({
     timeout: 10000,
 });
 
-// Interceptor para injetar o JWT automaticamente
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('alvorada_jwt');
     if (token) {
@@ -20,5 +19,13 @@ api.interceptors.request.use((config) => {
     }
     return config;
 }, (error) => {
+    return Promise.reject(error);
+});
+
+api.interceptors.response.use((response) => response, (error) => {
+    if (error.response && error.response.status === 401) {
+        localStorage.removeItem('alvorada_jwt');
+        window.location.href = '/login';
+    }
     return Promise.reject(error);
 });

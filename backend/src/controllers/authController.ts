@@ -9,9 +9,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-alvorada-key-1975';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { email, password } = req.body;
+        const { email, senha } = req.body;
 
-        if (!email || !password) {
+        if (!email || !senha) {
             res.status(400).json({ error: 'Email e senha são obrigatórios' });
             return;
         }
@@ -28,7 +28,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const isPasswordValid = await bcrypt.compare(password, userRecord.senhaHash);
+        const isPasswordValid = await bcrypt.compare(senha, userRecord.senhaHash);
 
         if (!isPasswordValid) {
             res.status(401).json({ error: 'Credenciais inválidas' });
