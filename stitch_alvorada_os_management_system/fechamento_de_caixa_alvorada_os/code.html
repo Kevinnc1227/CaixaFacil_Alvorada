@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fechamento de Caixa - Alvorada OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#001135",
+                        "surface-variant": "#243458",
+                        "on-secondary-fixed": "#410004",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#000c2b",
+                        "primary-container": "#0d1b3e",
+                        "surface-container-high": "#19294d",
+                        "surface": "#001135",
+                        "on-error": "#690005",
+                        "on-secondary": "#68000c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary": "#b9c5f2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "tertiary": "#c6c6c7",
+                        "surface-container-highest": "#243458",
+                        "on-primary": "#222f53",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#b9c5f2",
+                        "on-primary-container": "#7784ad",
+                        "inverse-surface": "#d9e2ff",
+                        "inverse-on-surface": "#202f54",
+                        "surface-container-low": "#081a3d",
+                        "outline-variant": "#45464e",
+                        "on-secondary-fixed-variant": "#930015",
+                        "secondary": "#ffb3ae",
+                        "on-surface-variant": "#c6c6cf",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-tertiary": "#2f3131",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed": "#ffdad7",
+                        "surface-bright": "#29385d",
+                        "error": "#ffb4ab",
+                        "surface-container": "#0d1e42",
+                        "surface-tint": "#b9c5f2",
+                        "on-tertiary-container": "#848585",
+                        "inverse-primary": "#515d84",
+                        "outline": "#8f9099",
+                        "tertiary-container": "#1b1d1d",
+                        "on-primary-fixed-variant": "#39456b",
+                        "on-secondary-container": "#ffa39d",
+                        "on-error-container": "#ffdad6",
+                        "background": "#001135",
+                        "secondary-container": "#9b0217",
+                        "on-primary-fixed": "#0b1a3d",
+                        "on-background": "#d9e2ff",
+                        "on-surface": "#d9e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Lexend"],
+                        "display-lg": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "stat-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "fontWeight": "800"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "stat-lg": ["40px", {"lineHeight": "1.0", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-full overflow-hidden flex">
+<!-- SideNavBar Component -->
+<nav class="hidden md:flex flex-col fixed left-0 top-0 h-full w-64 border-r border-white/10 bg-slate-950 z-50 pt-4 pb-6">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-red-600 flex items-center justify-center text-white font-bold text-xl">A</div>
+<div>
+<h1 class="font-label-bold text-label-bold text-red-600 tracking-tight">Alvorada OS</h1>
+<p class="text-xs text-slate-400 font-medium">Stadium Operations</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-y-auto px-2">
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">point_of_sale</span>
+                PDV
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                Estoque
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+                Fichas
+            </a>
+<a class="flex items-center gap-3 bg-red-600 text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                Fechamento
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 font-['Lexend'] text-sm font-medium hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+                Suporte
+            </a>
+</div>
+<div class="px-4 mt-auto">
+<button class="w-full bg-red-600 text-white rounded-lg py-3 font-label-bold text-label-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Novo Pedido
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 h-full overflow-y-auto bg-surface-dim p-margin">
+<header class="mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Fechamento de Caixa</h2>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                Match Day Results • Oct 24, 2023
+            </p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Total Sales Card (Featured) -->
+<div class="lg:col-span-2 bg-surface-variant rounded-xl border border-white/10 border-t-[4px] border-t-secondary-container p-lg flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-12 -top-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-700">
+<span class="material-symbols-outlined text-[200px]">account_balance</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-sm">Total Sales</h3>
+<div class="flex items-baseline gap-2">
+<span class="font-stat-lg text-stat-lg text-on-surface">R$ 142.850,00</span>
+</div>
+</div>
+<div class="mt-lg flex items-center gap-2 text-primary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12.5% vs last match</span>
+</div>
+</div>
+<!-- Items Sold Card -->
+<div class="bg-surface-variant rounded-xl border border-white/10 border-t-[4px] border-t-outline-variant p-lg flex flex-col justify-between">
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-sm">Items Sold</h3>
+<div class="font-stat-lg text-stat-lg text-on-surface">4,892</div>
+</div>
+<div class="mt-lg w-full bg-surface-dim h-2 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full w-[75%] rounded-full"></div>
+</div>
+</div>
+<!-- Open Tabs Card -->
+<div class="bg-surface-variant rounded-xl border border-white/10 p-lg flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Open Tabs</h3>
+<span class="inline-flex items-center gap-1 bg-error-container/20 text-error px-2 py-1 rounded font-label-bold text-[12px] uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                        Action Required
+                    </span>
+</div>
+<div class="flex items-end justify-between mt-auto">
+<div class="font-display-lg text-display-lg text-on-surface">14</div>
+<span class="material-symbols-outlined text-[40px] text-error-container">receipt_long</span>
+</div>
+</div>
+<!-- Paid Tabs Card -->
+<div class="bg-surface-variant rounded-xl border border-white/10 p-lg flex flex-col justify-between">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider">Paid Tabs</h3>
+<span class="inline-flex items-center gap-1 bg-primary-fixed/10 text-primary-fixed px-2 py-1 rounded font-label-bold text-[12px] uppercase">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                        Cleared
+                    </span>
+</div>
+<div class="flex items-end justify-between mt-auto">
+<div class="font-display-lg text-display-lg text-on-surface">312</div>
+<span class="material-symbols-outlined text-[40px] text-primary-container">task_alt</span>
+</div>
+</div>
+<!-- Average Transaction Card -->
+<div class="bg-surface-variant rounded-xl border border-white/10 p-lg flex flex-col justify-between">
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider mb-sm">Avg. Transaction</h3>
+<div class="font-headline-lg text-headline-lg text-on-surface">R$ 45,78</div>
+</div>
+<div class="mt-lg">
+<div class="h-[40px] w-full flex items-end gap-1 opacity-50">
+<div class="w-full bg-primary-container rounded-t h-[40%]"></div>
+<div class="w-full bg-primary-container rounded-t h-[60%]"></div>
+<div class="w-full bg-primary-container rounded-t h-[50%]"></div>
+<div class="w-full bg-primary-container rounded-t h-[80%]"></div>
+<div class="w-full bg-primary rounded-t h-[90%]"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

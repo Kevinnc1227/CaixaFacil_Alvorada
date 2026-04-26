@@ -1,18 +1,73 @@
-# Lixo de Compilação (O que o Java gera)
-*.class
-*.log
-*.ctxt
-bin/
+# ====================
+# Node / NPM
+# ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ====================
+# Build outputs
+# ====================
+dist/
+build/
 out/
 target/
+bin/
 
-# Lixo de IDE (Configurações pessoais)
+# ====================
+# Environment files
+# ====================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ====================
+# Database
+# ====================
+backend/database.sqlite
+backend/*.sqlite
+backend/*.db
+
+# ====================
+# Logs
+# ====================
+logs/
+*.log
+*.ctxt
+
+# ====================
+# OS files
+# ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ====================
+# IDE / Editor
+# ====================
+.vscode/
 .idea/
 .settings/
 .classpath
 .project
-.vscode/
+*.suo
+*.swp
 
-# Arquivos de Sistema
-Thumbs.db
-.DS_Store
+# ====================
+# Java (legado)
+# ====================
+*.class
+
+# ====================
+# TypeScript
+# ====================
+*.tsbuildinfo
+
+# ====================
+# Misc
+# ====================
+.cache/
+coverage/

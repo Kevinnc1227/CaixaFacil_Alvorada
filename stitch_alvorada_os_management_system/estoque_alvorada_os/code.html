@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Controle de Estoque - ALVORADA OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c6c6cf",
+                        "on-tertiary-container": "#848585",
+                        "error-container": "#93000a",
+                        "secondary-container": "#9b0217",
+                        "on-tertiary": "#2f3131",
+                        "surface-container-lowest": "#000c2b",
+                        "surface-tint": "#b9c5f2",
+                        "surface-dim": "#001135",
+                        "surface": "#001135",
+                        "secondary-fixed": "#ffdad7",
+                        "primary-container": "#0d1b3e",
+                        "on-primary-container": "#7784ad",
+                        "on-primary-fixed": "#0b1a3d",
+                        "on-secondary": "#68000c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#243458",
+                        "on-secondary-fixed": "#410004",
+                        "inverse-surface": "#d9e2ff",
+                        "surface-container-low": "#081a3d",
+                        "on-secondary-container": "#ffa39d",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "primary-fixed": "#dbe1ff",
+                        "inverse-primary": "#515d84",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-surface": "#d9e2ff",
+                        "on-error": "#690005",
+                        "outline-variant": "#45464e",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#202f54",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#8f9099",
+                        "on-primary": "#222f53",
+                        "surface-container": "#0d1e42",
+                        "secondary": "#ffb3ae",
+                        "background": "#001135",
+                        "primary-fixed-dim": "#b9c5f2",
+                        "surface-variant": "#243458",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary": "#b9c5f2",
+                        "on-background": "#d9e2ff",
+                        "surface-bright": "#29385d",
+                        "on-secondary-fixed-variant": "#930015",
+                        "tertiary-container": "#1b1d1d",
+                        "surface-container-high": "#19294d",
+                        "on-primary-fixed-variant": "#39456b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "margin": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Lexend"],
+                        "stat-lg": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "display-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-lg": ["40px", {"lineHeight": "1.0", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen w-full overflow-hidden flex selection:bg-primary-container selection:text-primary">
+<aside class="hidden md:flex flex-col h-screen w-64 border-r border-white/10 bg-[#0D1B3E] py-4 z-10 shrink-0">
+<div class="px-6 mb-8">
+<h2 class="text-[#C0272D] font-black text-xl font-['Lexend'] tracking-wider">ALVORADA</h2>
+<p class="text-on-primary-container text-xs tracking-widest uppercase mt-1">Canteen Ops</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-slate-300 hover:bg-white/5 hover:text-white transition-all font-['Lexend'] text-sm font-medium group active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-slate-300 hover:bg-white/5 hover:text-white transition-all font-['Lexend'] text-sm font-medium group active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">point_of_sale</span>
+                PDV
+            </a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT bg-white/5 text-[#C0272D] border-r-4 border-[#C0272D] font-['Lexend'] text-sm font-medium active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+                Estoque
+            </a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-slate-300 hover:bg-white/5 hover:text-white transition-all font-['Lexend'] text-sm font-medium group active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">confirmation_number</span>
+                Fichas
+            </a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-slate-300 hover:bg-white/5 hover:text-white transition-all font-['Lexend'] text-sm font-medium group active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">account_balance_wallet</span>
+                Caixa
+            </a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-DEFAULT text-slate-300 hover:bg-white/5 hover:text-white transition-all font-['Lexend'] text-sm font-medium group active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">support_agent</span>
+                Suporte
+            </a>
+</nav>
+</aside>
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+<header class="flex justify-between items-center px-6 h-16 w-full bg-[#0D1B3E] border-b border-white/10 shrink-0 z-10">
+<div class="md:hidden">
+<h1 class="text-2xl font-black text-[#C0272D] font-['Lexend'] uppercase tracking-wider font-bold">ALVORADA OS</h1>
+</div>
+<div class="hidden md:flex flex-1 max-w-md ml-auto mr-6 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-primary-container pointer-events-none">search</span>
+<input class="w-full h-[44px] bg-surface-container-highest border-transparent rounded-DEFAULT pl-10 pr-4 text-on-surface placeholder:text-on-primary-container focus:border-[#C0272D] focus:ring-1 focus:ring-[#C0272D] transition-colors font-body-md text-body-md" placeholder="Buscar no sistema..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-DEFAULT text-slate-400 hover:bg-white/5 hover:text-white transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-DEFAULT text-slate-400 hover:bg-white/5 hover:text-white transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-md md:p-margin bg-background">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Controle de Estoque</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Gerencie os produtos, quantidades e valores de venda.</p>
+</div>
+<div class="flex gap-md">
+<button class="h-[44px] px-6 bg-surface-container-highest border border-white/10 text-on-surface font-label-bold text-label-bold rounded-DEFAULT flex items-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+                        Filtros
+                    </button>
+<button class="h-[44px] px-6 bg-[#C0272D] text-white font-label-bold text-label-bold rounded-DEFAULT flex items-center gap-2 hover:bg-[#a62025] transition-colors shadow-lg shadow-[#C0272D]/20 active:scale-95">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add</span>
+                        Adicionar Item
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-lg">
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">inventory</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-body-md text-sm">Total de Itens</p>
+<p class="font-headline-md text-headline-md text-on-surface">124</p>
+</div>
+</div>
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 border border-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-body-md text-sm">Estoque Baixo</p>
+<p class="font-headline-md text-headline-md text-secondary">8</p>
+</div>
+</div>
+<div class="bg-surface-container border border-error/30 rounded-lg p-md flex items-center gap-4 bg-gradient-to-r from-error-container/40 to-transparent">
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div>
+<p class="text-on-surface-variant font-body-md text-sm">Esgotados</p>
+<p class="font-headline-md text-headline-md text-error">3</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md">
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex flex-col justify-between hover:border-white/30 transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">sports_bar</span>
+</div>
+<span class="px-2 py-1 rounded bg-surface-variant text-on-surface-variant text-xs font-bold uppercase tracking-wider">Em estoque</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Cerveja Pilsen</h3>
+<p class="text-on-surface-variant text-sm mb-4">Lata 350ml</p>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<span class="text-on-surface-variant text-sm">Preço Unitário</span>
+<span class="font-label-bold text-label-bold text-on-surface">R$ 8,00</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-DEFAULT p-1 border border-white/5">
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Qtd</span>
+<span class="font-stat-lg text-[24px] text-on-surface leading-none">150</span>
+</div>
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-secondary-container rounded-lg p-md flex flex-col justify-between shadow-[0_0_15px_rgba(155,2,23,0.15)] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-secondary-container to-transparent opacity-50 pointer-events-none"></div>
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">tapas</span>
+</div>
+<span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span> Baixo
+                            </span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Coxinha de Frango</h3>
+<p class="text-on-surface-variant text-sm mb-4">Porção Individual</p>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<span class="text-on-surface-variant text-sm">Preço Unitário</span>
+<span class="font-label-bold text-label-bold text-on-surface">R$ 6,50</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-DEFAULT p-1 border border-secondary-container/30">
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] text-secondary uppercase tracking-wider font-bold">Qtd</span>
+<span class="font-stat-lg text-[24px] text-secondary leading-none">12</span>
+</div>
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-[#0b1221] border border-error/50 rounded-lg p-md flex flex-col justify-between opacity-80 group">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<span class="px-2 py-1 rounded bg-error text-on-error text-xs font-bold uppercase tracking-wider animate-pulse">Esgotado</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1 line-through decoration-error/50">Água Mineral</h3>
+<p class="text-on-surface-variant text-sm mb-4">Sem gás 500ml</p>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b border-error/20 pb-2">
+<span class="text-on-surface-variant text-sm">Preço Unitário</span>
+<span class="font-label-bold text-label-bold text-on-surface">R$ 4,00</span>
+</div>
+<div class="flex items-center justify-between bg-error-container/10 rounded-DEFAULT p-1 border border-error/30">
+<button class="w-[40px] h-[40px] flex items-center justify-center text-error/50 cursor-not-allowed rounded-DEFAULT">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] text-error uppercase tracking-wider font-bold">Qtd</span>
+<span class="font-stat-lg text-[24px] text-error leading-none">0</span>
+</div>
+<button class="w-[40px] h-[40px] flex items-center justify-center text-error hover:bg-error-container/30 rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex flex-col justify-between hover:border-white/30 transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<span class="px-2 py-1 rounded bg-surface-variant text-on-surface-variant text-xs font-bold uppercase tracking-wider">Em estoque</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Energético</h3>
+<p class="text-on-surface-variant text-sm mb-4">Lata 250ml</p>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<span class="text-on-surface-variant text-sm">Preço Unitário</span>
+<span class="font-label-bold text-label-bold text-on-surface">R$ 12,00</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-DEFAULT p-1 border border-white/5">
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Qtd</span>
+<span class="font-stat-lg text-[24px] text-on-surface leading-none">45</span>
+</div>
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex flex-col justify-between hover:border-white/30 transition-colors group">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined">kebab_dining</span>
+</div>
+<span class="px-2 py-1 rounded bg-surface-variant text-on-surface-variant text-xs font-bold uppercase tracking-wider">Em estoque</span>
+</div>
+<h3 class="font-headline-md text-[20px] text-on-surface mb-1">Espetinho de Carne</h3>
+<p class="text-on-surface-variant text-sm mb-4">Acompanha farofa</p>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end border-b border-white/5 pb-2">
+<span class="text-on-surface-variant text-sm">Preço Unitário</span>
+<span class="font-label-bold text-label-bold text-on-surface">R$ 10,00</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-DEFAULT p-1 border border-white/5">
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex flex-col items-center justify-center">
+<span class="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Qtd</span>
+<span class="font-stat-lg text-[24px] text-on-surface leading-none">80</span>
+</div>
+<button class="w-[40px] h-[40px] flex items-center justify-center text-on-surface-variant hover:text-white hover:bg-surface-variant rounded-DEFAULT transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container border border-white/10 rounded-lg p-md flex flex-col justify-center items-center hover:border-white/30 transition-colors group border-dashed cursor-pointer min-h-[240px]">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant mb-4 group-hover:bg-[#C0272D] group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface-variant group-hover:text-white transition-colors">Cadastrar Novo Produto</p>
+</div>
+</div>
+</main>
+</div>
+</body></html>
