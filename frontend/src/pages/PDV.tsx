@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-
-// Mock data until API is integrated
-const MOCK_PRODUCTS = [
-    { id: 1, nome: 'Cerveja Pilsen Lata 350ml', categoria: 'Bebidas', precoVenda: 12.0, qtdEstoque: 150 },
-    { id: 2, nome: 'Água Mineral Sem Gás 500ml', categoria: 'Bebidas', precoVenda: 5.0, qtdEstoque: 80 },
-    { id: 3, nome: 'Coxinha de Frango', categoria: 'Salgados', precoVenda: 8.5, qtdEstoque: 50 },
-    { id: 4, nome: 'Combo Torcedor', categoria: 'Combos', precoVenda: 30.0, qtdEstoque: 40 },
-    { id: 5, nome: 'Amendoim Japonês', categoria: 'Outros', precoVenda: 6.0, qtdEstoque: 0 },
-];
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { api } from '../api/api';
 
 export default function PDV() {
+    const queryClient = useQueryClient();
     const [filter, setFilter] = useState('Todos');
     const [search, setSearch] = useState('');
 
     // Carrinho local state [{ produto, qtd }]
     const [cart, setCart] = useState<{ produto: any; qtd: number }[]>([]);
 
-    const filteredProducts = MOCK_PRODUCTS.filter(p => {
+    const { data: produtos = [], isLoading } = useQuery({
+        queryKey: ['produtos'],
+        queryFn: async () => {
+            const res = await api.get('/produtos');
+            return res.data;
+        }
+    });
+
+    const filteredProducts = produtos.filter((p: any) => {
         const matchCategory = filter === 'Todos' || p.categoria === filter;
         const matchSearch = p.nome.toLowerCase().includes(search.toLowerCase());
-        return matchCategory && matchSearch;
+        return matchCategory && matchSearch && p.ativo;
     });
 
     const addToCart = (product: any) => {
@@ -47,6 +50,23 @@ export default function PDV() {
 
     const subtotal = cart.reduce((acc, item) => acc + (item.produto.precoVenda * item.qtd), 0);
 
+    const checkoutMutation = useMutation({
+        mutationFn: async () => {
+            const itens = cart.map(item => ({ produtoId: item.produto.id, quantidade: item.qtd }));
+            // Supondo checkout apenas 'PAGAR_AGORA' ou direto no balcão por padrão no botão verde
+            const res = await api.post('/pedidos', { tipo: 'PAGAR_AGORA', itens });
+            return res.data;
+        },
+        onSuccess: () => {
+            toast.success("Pedido fechado com sucesso!");
+            clearCart();
+            queryClient.invalidateQueries({ queryKey: ['produtos'] });
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.error || "Erro ao fechar pedido");
+        }
+    });
+
     return (
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden gap-xs md:gap-md h-full">
             {/* Product Grid (Left Canvas) */}
@@ -68,8 +88,8 @@ export default function PDV() {
                             <button
                                 key={cat} onClick={() => setFilter(cat)}
                                 className={`px-4 py-2 rounded-lg font-label-bold whitespace-nowrap transition-colors border ${filter === cat
-                                        ? 'bg-secondary-container text-white border-secondary-container shadow-inner'
-                                        : 'bg-surface-container-high border-outline-variant text-on-surface hover:bg-surface-bright'
+                                    ? 'bg-secondary-container text-white border-secondary-container shadow-inner'
+                                    : 'bg-surface-container-high border-outline-variant text-on-surface hover:bg-surface-bright'
                                     }`}
                             >
                                 {cat}
@@ -79,7 +99,9 @@ export default function PDV() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-md grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-md content-start">
-                    {filteredProducts.map(produto => {
+                    {isLoading ? (
+                        <div className="col-span-full flex justify-center py-8 text-on-surface-variant">Carregando produtos...</div>
+                    ) : filteredProducts.map((produto: any) => {
                         const isEsgotado = produto.qtdEstoque <= 0;
                         return (
                             <button
@@ -157,11 +179,12 @@ export default function PDV() {
                         </span>
                     </div>
                     <button
-                        disabled={cart.length === 0}
+                        onClick={() => checkoutMutation.mutate()}
+                        disabled={cart.length === 0 || checkoutMutation.isPending}
                         className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span className="material-symbols-outlined fill text-[28px]">payments</span>
-                        FECHAR PEDIDO
+                        {checkoutMutation.isPending ? 'PROCESSANDO...' : 'FECHAR PEDIDO'}
                     </button>
                 </div>
             </aside>
