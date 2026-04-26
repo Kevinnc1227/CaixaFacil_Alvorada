@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { authApi } from '../api/api';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    const loginMutation = useMutation({
+        mutationFn: async () => {
+            const res = await authApi.post('/login', {
+                email,
+                senha: password
+            });
+            return res.data;
+        },
+        onSuccess: (data) => {
+            if (data.token) localStorage.setItem('alvorada_jwt', data.token);
+            if (data.user) localStorage.setItem('alvorada_user', JSON.stringify(data.user));
+            toast.success('Login aprovado!');
+            navigate('/pdv');
+        },
+        onError: (error: any) => {
+            const message = error.response?.data?.error || 'Falha ao autenticar. Tente novamente.';
+            toast.error(message);
+        }
+    });
+
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        // Todo: Integrate API Auth. Bypass for MVP mock.
         if (email && password) {
-            navigate('/pdv');
+            loginMutation.mutate();
         }
     };
 
@@ -41,6 +63,7 @@ export default function Login() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="input pl-10"
+                                disabled={loginMutation.isPending}
                             />
                         </div>
                     </div>
@@ -56,13 +79,16 @@ export default function Login() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="input pl-10"
+                                disabled={loginMutation.isPending}
                             />
                         </div>
                     </div>
 
-                    <button type="submit" className="btn-primary mt-4 group">
-                        Entrar
-                        <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+                    <button type="submit" disabled={loginMutation.isPending} className="btn-primary mt-4 group">
+                        {loginMutation.isPending ? 'Verificando...' : 'Entrar'}
+                        {!loginMutation.isPending && (
+                            <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+                        )}
                     </button>
                 </form>
 
