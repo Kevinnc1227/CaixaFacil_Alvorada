@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login';
+import PDV from './pages/PDV';
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/pdv" replace />} />
-          <Route path="pdv" element={<div>PDV (WIP)</div>} />
+          <Route path="pdv" element={<PDV />} />
           <Route path="estoque" element={<div>Estoque (WIP)</div>} />
           <Route path="fichas" element={<div>Fichas (WIP)</div>} />
           <Route path="caixa" element={<div>Caixa (WIP)</div>} />
