@@ -1,0 +1,18 @@
+# Lixo de Compilação (O que o Java gera)
+*.class
+*.log
+*.ctxt
+bin/
+out/
+target/
+
+# Lixo de IDE (Configurações pessoais)
+.idea/
+.settings/
+.classpath
+.project
+.vscode/
+
+# Arquivos de Sistema
+Thumbs.db
+.DS_Store
