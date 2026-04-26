@@ -7,12 +7,14 @@
 
 /* ─── Base Reset ─── */
 @layer base {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
   html {
-    @apply dark;
     scroll-behavior: smooth;
   }
 
@@ -28,12 +30,15 @@
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-outline-variant rounded-full;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-outline;
   }
@@ -41,71 +46,79 @@
 
 /* ─── Components ─── */
 @layer components {
+
   /* Material Symbols */
   .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     user-select: none;
   }
+
   .material-symbols-outlined.fill {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 
   /* Primary Button (Vermelho) */
   .btn-primary {
-    @apply bg-secondary-container hover:bg-error-container text-white
-           rounded-lg font-headline-md text-headline-md
-           transition-all duration-200 active:scale-[0.98]
-           border border-red-500/30 shadow-lg shadow-red-900/20
-           flex items-center justify-center gap-2 px-md py-3;
+    @apply bg-secondary-container hover:bg-error-container text-white rounded-lg text-headline-md transition-all duration-200 active:scale-[0.98] border border-red-500/30 shadow-lg shadow-red-900/20 flex items-center justify-center gap-2 px-md py-3;
     min-height: 48px;
   }
 
   /* Secondary Button */
   .btn-secondary {
-    @apply bg-surface-container-high hover:bg-surface-container-highest
-           text-on-surface rounded-lg font-label-bold text-label-bold
-           border border-outline-variant transition-all duration-200
-           active:scale-[0.98] flex items-center justify-center gap-2
-           px-md py-3;
+    @apply bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-label-bold border border-outline-variant transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 px-md py-3;
     min-height: 48px;
   }
 
   /* Card */
   .card {
-    @apply bg-surface-container border border-outline-variant rounded-lg
-           overflow-hidden;
+    @apply bg-surface-container border border-outline-variant rounded-lg overflow-hidden;
   }
 
   /* Input */
   .input {
-    @apply bg-surface-container-lowest border border-outline-variant
-           text-on-surface placeholder:text-on-surface-variant
-           rounded-lg px-md py-3 focus:outline-none
-           focus:border-primary-fixed-dim transition-colors
-           font-body-md text-body-md w-full;
+    @apply bg-surface-container-lowest border border-outline-variant text-on-surface placeholder:text-on-surface-variant rounded-lg px-md py-3 focus:outline-none focus:border-primary-fixed-dim transition-colors text-body-md w-full;
   }
 
   /* Badge */
   .badge-error {
-    @apply bg-secondary-container text-white text-xs font-bold
-           rounded-full px-2 py-0.5 min-w-[20px] text-center;
+    @apply bg-secondary-container text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center;
   }
 
   /* Status Tags */
   .tag {
-    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full
-           text-xs font-bold uppercase tracking-wide;
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide;
   }
-  .tag-open    { @apply bg-secondary-container/30 text-secondary-fixed-dim; }
-  .tag-ongoing { @apply bg-yellow-900/30 text-yellow-300; }
-  .tag-done    { @apply bg-green-900/30 text-green-300; }
-  .tag-closed  { @apply bg-outline-variant/30 text-on-surface-variant; }
+
+  .tag-open {
+    @apply bg-secondary-container/30 text-secondary-fixed-dim;
+  }
+
+  .tag-ongoing {
+    @apply bg-yellow-900/30 text-yellow-300;
+  }
+
+  .tag-done {
+    @apply bg-green-900/30 text-green-300;
+  }
+
+  .tag-closed {
+    @apply bg-outline-variant/30 text-on-surface-variant;
+  }
 }
 
 /* ─── Utilities ─── */
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  .selection-red ::selection { @apply bg-secondary-container text-white; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .selection-red ::selection {
+    @apply bg-secondary-container text-white;
+  }
 }
