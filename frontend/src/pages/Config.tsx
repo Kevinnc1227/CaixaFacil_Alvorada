@@ -1,6 +1,15 @@
-import React from 'react';
+ from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../api/api';
 
 export default function Config() {
+    const { data: usuarios = [], isLoading } = useQuery({
+        queryKey: ['usuarios'],
+        queryFn: async () => {
+            const res = await api.get('/usuarios');
+            return res.data;
+        }
+    });
     return (
         <div className="flex flex-col gap-lg h-full max-w-4xl mx-auto w-full">
             <header className="flex justify-between items-center bg-surface p-md rounded-xl shadow-sm border border-outline-variant">
@@ -29,16 +38,26 @@ export default function Config() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td className="py-4 border-b border-outline-variant/30 text-on-surface">Administrador</td>
-                                <td className="py-4 border-b border-outline-variant/30"><span className="bg-primary-container text-primary px-2 py-0.5 rounded text-xs font-bold">ADMINISTRADOR</span></td>
-                                <td className="py-4 border-b border-outline-variant/30"><span className="text-primary text-sm font-bold">Ativo</span></td>
-                            </tr>
-                            <tr>
-                                <td className="py-4 border-b border-outline-variant/30 text-on-surface">Caixa 01 (João)</td>
-                                <td className="py-4 border-b border-outline-variant/30"><span className="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded text-xs font-bold">OPERADOR</span></td>
-                                <td className="py-4 border-b border-outline-variant/30"><span className="text-primary text-sm font-bold">Ativo</span></td>
-                            </tr>
+                            {isLoading ? (
+                                <tr><td colSpan={3} className="py-4 text-center">Carregando usuários...</td></tr>
+                            ) : usuarios.map((user: any) => (
+                                <tr key={user.id}>
+                                    <td className="py-4 border-b border-outline-variant/30 text-on-surface flex flex-col">
+                                        <span>{user.nome}</span>
+                                        <span className="text-xs text-on-surface-variant">{user.email}</span>
+                                    </td>
+                                    <td className="py-4 border-b border-outline-variant/30">
+                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${user.perfil === 'ADMINISTRADOR' ? 'bg-primary-container text-primary' : 'bg-surface-variant text-on-surface-variant'}`}>
+                                            {user.perfil}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 border-b border-outline-variant/30">
+                                        <span className={`text-sm font-bold ${user.ativo ? 'text-primary' : 'text-error'}`}>
+                                            {user.ativo ? 'Ativo' : 'Inativo'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                     <button className="btn-secondary mt-4"><span className="material-symbols-outlined mr-2">person_add</span>Adicionar Operador</button>
