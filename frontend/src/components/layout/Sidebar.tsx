@@ -5,6 +5,7 @@ const navItems = [
     { path: '/pdv', label: 'PDV', icon: 'point_of_sale' },
     { path: '/estoque', label: 'Estoque', icon: 'inventory_2' },
     { path: '/fichas', label: 'Fichas', icon: 'confirmation_number' },
+    { path: '/reserva-campo', label: 'Campo', icon: 'sports_soccer' },
     { path: '/caixa', label: 'Fechamento', icon: 'account_balance_wallet' },
     { path: '/suporte', label: 'Suporte', icon: 'support_agent' },
     { path: '/config', label: 'Ajustes', icon: 'settings' },

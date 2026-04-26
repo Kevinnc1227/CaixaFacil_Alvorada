@@ -94,3 +94,23 @@ export const ajustesEstoque = sqliteTable('ajustes_estoque', {
     motivo: text('motivo').notNull(),
     criadoEm: integer('criado_em', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
+
+// ─── RESERVA DE CAMPO ────────────────────────────────────────────────────────
+// Fato gerador de atendimento: ao criar uma reserva, um Ticket de suporte é
+// automaticamente aberto e o valor é computado no Caixa do dia.
+export const reservasCampo = sqliteTable('reservas_campo', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    // Data e horário do aluguel
+    dataReserva: text('data_reserva').notNull(),       // 'YYYY-MM-DD'
+    horaInicio: text('hora_inicio').notNull(),          // 'HH:MM'
+    horaFim: text('hora_fim').notNull(),                // 'HH:MM'
+    valorTotal: real('valor_total').notNull(),
+    status: text('status', { enum: ['PENDENTE', 'CONFIRMADA', 'CANCELADA', 'CONCLUIDA'] })
+        .notNull()
+        .default('CONFIRMADA'),
+    // Relacionamentos
+    clienteId: integer('cliente_id').notNull().references(() => clientes.id),
+    ticketId: integer('ticket_id').references(() => tickets.id),   // OneToOne — criado automaticamente
+    usuarioId: integer('usuario_id').notNull().references(() => usuarios.id),
+    criadoEm: integer('criado_em', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});

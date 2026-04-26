@@ -8,6 +8,7 @@ import Fichas from './pages/Fichas';
 import Caixa from './pages/Caixa';
 import Suporte from './pages/Suporte';
 import Config from './pages/Config';
+import ReservaCampo from './pages/ReservaCampo';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="caixa" element={<Caixa />} />
           <Route path="suporte" element={<Suporte />} />
           <Route path="config" element={<Config />} />
+          <Route path="reserva-campo" element={<ReservaCampo />} />
         </Route>
       </Routes>
     </BrowserRouter>
