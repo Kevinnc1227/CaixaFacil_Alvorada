@@ -13,6 +13,22 @@ export const listClientes = async (req: Request, res: Response): Promise<void> =
     }
 };
 
+export const listTodasFichas = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const result = await db.select({
+            id: fichas.id,
+            clienteId: clientes.id,
+            nome: clientes.nomeCompleto,
+            cpf: clientes.cpf,
+            status: fichas.status,
+            totalAcumulado: fichas.totalAcumulado
+        }).from(fichas).innerJoin(clientes, eq(fichas.clienteId, clientes.id)).orderBy(desc(fichas.id));
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao listar fichas' });
+    }
+};
+
 export const createCliente = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { nomeCompleto, cpf, telefone, observacoes } = req.body;
