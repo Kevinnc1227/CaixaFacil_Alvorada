@@ -6,6 +6,8 @@ import PDV from './pages/PDV';
 import Estoque from './pages/Estoque';
 import Fichas from './pages/Fichas';
 import Caixa from './pages/Caixa';
+import Suporte from './pages/Suporte';
+import Config from './pages/Config';
 
 function App() {
   return (
@@ -19,8 +21,8 @@ function App() {
           <Route path="estoque" element={<Estoque />} />
           <Route path="fichas" element={<Fichas />} />
           <Route path="caixa" element={<Caixa />} />
-          <Route path="suporte" element={<div>Suporte (WIP)</div>} />
-          <Route path="config" element={<div>Config (WIP)</div>} />
+          <Route path="suporte" element={<Suporte />} />
+          <Route path="config" element={<Config />} />
         </Route>
       </Routes>
     </BrowserRouter>
