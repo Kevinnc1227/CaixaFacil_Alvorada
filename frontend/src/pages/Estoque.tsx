@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-
-const MOCK_STOCK = [
-    { id: 1, nome: 'Cerveja Pilsen Lata 350ml', categoria: 'Bebidas', precoVenda: 12.0, qtdEstoque: 150, qtdMinima: 30 },
-    { id: 2, nome: 'Água Mineral Sem Gás 500ml', categoria: 'Bebidas', precoVenda: 5.0, qtdEstoque: 80, qtdMinima: 20 },
-    { id: 3, nome: 'Coxinha de Frango', categoria: 'Salgados', precoVenda: 8.5, qtdEstoque: 50, qtdMinima: 10 },
-    { id: 5, nome: 'Amendoim Japonês', categoria: 'Outros', precoVenda: 6.0, qtdEstoque: 0, qtdMinima: 10 },
-];
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../api/api';
 
 export default function Estoque() {
-    const [stock] = useState(MOCK_STOCK);
+    const { data: stock = [], isLoading } = useQuery({
+        queryKey: ['produtos'],
+        queryFn: async () => {
+            const res = await api.get('/produtos');
+            return res.data;
+        }
+    });
+
+    const totalItens = stock.length;
+    const criticos = stock.filter((s: any) => s.qtdEstoque <= s.qtdMinima && s.qtdEstoque > 0).length;
+    const esgotados = stock.filter((s: any) => s.qtdEstoque <= 0).length;
+    const categorias = new Set(stock.map((s: any) => s.categoria)).size;
 
     return (
         <div className="flex flex-col gap-md h-full">
@@ -28,28 +34,28 @@ export default function Estoque() {
                     <div className="bg-primary-container p-3 rounded-full text-primary"><span className="material-symbols-outlined">inventory_2</span></div>
                     <div>
                         <p className="text-xs text-on-surface-variant font-label-bold uppercase">Total Itens</p>
-                        <p className="text-2xl font-bold text-on-surface">345</p>
+                        <p className="text-2xl font-bold text-on-surface">{isLoading ? '-' : totalItens}</p>
                     </div>
                 </div>
                 <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm flex items-center gap-4">
                     <div className="bg-error-container p-3 rounded-full text-error"><span className="material-symbols-outlined">warning</span></div>
                     <div>
                         <p className="text-xs text-on-surface-variant font-label-bold uppercase">Estoque Crítico</p>
-                        <p className="text-2xl font-bold text-error">12</p>
+                        <p className="text-2xl font-bold text-error">{isLoading ? '-' : criticos}</p>
                     </div>
                 </div>
                 <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm flex items-center gap-4">
                     <div className="bg-secondary-container p-3 rounded-full text-secondary"><span className="material-symbols-outlined">production_quantity_limits</span></div>
                     <div>
                         <p className="text-xs text-on-surface-variant font-label-bold uppercase">Esgotados</p>
-                        <p className="text-2xl font-bold text-secondary">3</p>
+                        <p className="text-2xl font-bold text-secondary">{isLoading ? '-' : esgotados}</p>
                     </div>
                 </div>
                 <div className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm flex items-center gap-4">
                     <div className="bg-surface-variant p-3 rounded-full text-on-surface"><span className="material-symbols-outlined">category</span></div>
                     <div>
                         <p className="text-xs text-on-surface-variant font-label-bold uppercase">Categorias</p>
-                        <p className="text-2xl font-bold text-on-surface">8</p>
+                        <p className="text-2xl font-bold text-on-surface">{isLoading ? '-' : categorias}</p>
                     </div>
                 </div>
             </div>
@@ -66,7 +72,13 @@ export default function Estoque() {
                             </tr>
                         </thead>
                         <tbody>
-                            {stock.map(s => {
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={4} className="p-8 text-center text-on-surface-variant">
+                                        Carregando estoque...
+                                    </td>
+                                </tr>
+                            ) : stock.map((s: any) => {
                                 const criticallyLow = s.qtdEstoque <= s.qtdMinima;
                                 return (
                                     <tr key={s.id} className="hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/30">
