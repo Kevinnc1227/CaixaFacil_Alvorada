@@ -50,12 +50,13 @@ export default function Estoque() {
 
     const saveMutation = useMutation({
         mutationFn: async () => {
+            const parsedPreco = parseFloat(String(form.precoVenda).replace(',', '.'));
             const payload = {
                 nome: form.nome,
                 categoria: form.categoria,
-                precoVenda: parseFloat(String(form.precoVenda)),
-                qtdEstoque: parseInt(String(form.qtdEstoque)),
-                qtdMinima: parseInt(String(form.qtdMinima)),
+                precoVenda: isNaN(parsedPreco) ? 0 : parsedPreco,
+                qtdEstoque: parseInt(String(form.qtdEstoque)) || 0,
+                qtdMinima: parseInt(String(form.qtdMinima)) || 0,
             };
             if (editTarget) {
                 return api.put(`/produtos/${editTarget.id}`, payload);
