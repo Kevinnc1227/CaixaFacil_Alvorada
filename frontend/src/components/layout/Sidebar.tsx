@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const navItems = [
+export const navItems = [
     { path: '/pdv', label: 'PDV', icon: 'point_of_sale' },
     { path: '/estoque', label: 'Estoque', icon: 'inventory_2' },
     { path: '/fichas', label: 'Fichas', icon: 'confirmation_number' },

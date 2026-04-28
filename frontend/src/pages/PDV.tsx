@@ -19,6 +19,9 @@ export default function PDV() {
     const [showFichaModal, setShowFichaModal] = useState(false);
     const [fichaId, setFichaId] = useState<number | null>(null);
 
+    // Mobile cart
+    const [isCartMobileOpen, setIsCartMobileOpen] = useState(false);
+
     const { data: produtos = [], isLoading } = useQuery({
         queryKey: ['produtos'],
         queryFn: async () => {
@@ -183,11 +186,37 @@ export default function PDV() {
                 </div>
             </section>
 
+            {/* Mobile View Cart Button */}
+            {!isCartMobileOpen && (
+                <div className="md:hidden fixed bottom-4 left-4 right-4 z-30">
+                    <button
+                        onClick={() => setIsCartMobileOpen(true)}
+                        className="w-full bg-secondary text-white rounded-xl p-4 shadow-lg flex items-center justify-between font-label-bold"
+                    >
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined">shopping_cart</span>
+                            Ver Carrinho ({cart.reduce((a, i) => a + i.qtd, 0)})
+                        </div>
+                        <span className="font-headline-sm">
+                            {subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </span>
+                    </button>
+                </div>
+            )}
+
             {/* Cart */}
-            <aside className="flex-1 flex flex-col bg-surface-container rounded-xl border border-outline-variant shadow-lg min-w-[300px] max-w-[420px] overflow-hidden h-full">
+            <aside className={`
+                ${isCartMobileOpen ? 'fixed inset-0 z-40 bg-surface' : 'hidden md:flex'} 
+                flex-1 flex-col bg-surface-container rounded-none md:rounded-xl border-0 md:border border-outline-variant shadow-lg md:min-w-[300px] md:max-w-[420px] overflow-hidden h-full md:relative
+            `}>
                 <div className="flex items-center justify-between p-md border-b border-outline-variant bg-surface-container-high flex-shrink-0">
                     <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-on-surface">shopping_cart</span>
+                        {isCartMobileOpen && (
+                            <button onClick={() => setIsCartMobileOpen(false)} className="md:hidden text-on-surface mr-2 p-1">
+                                <span className="material-symbols-outlined">arrow_back</span>
+                            </button>
+                        )}
+                        <span className="material-symbols-outlined text-on-surface hidden md:block">shopping_cart</span>
                         <h2 className="font-headline-md text-on-surface">
                             Pedido Atual
                             {cart.length > 0 && (
@@ -257,6 +286,7 @@ export default function PDV() {
                             <span className="material-symbols-outlined fill text-[22px]">payments</span>
                             {checkoutMutation.isPending ? 'PROCESSANDO...' : 'PAGAR AGORA'}
                         </button>
+                    </div>
                     </div>
                 </div>
             </aside>
