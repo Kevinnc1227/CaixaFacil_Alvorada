@@ -64,6 +64,19 @@ export const updateProduto = async (req: Request, res: Response): Promise<void> 
     }
 };
 
+export const deleteProduto = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const id = Number(req.params.id);
+
+        await db.delete(produtos).where(eq(produtos.id, id));
+
+        res.json({ message: 'Produto excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        res.status(500).json({ error: 'Erro ao excluir produto' });
+    }
+};
+
 export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const produtoId = Number(req.params.id);

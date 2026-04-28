@@ -85,6 +85,27 @@ export default function Estoque() {
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao salvar produto.')
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            if (!editTarget) return;
+            return api.delete(`/produtos/${editTarget.id}`);
+        },
+        onSuccess: () => {
+            toast.success('Produto excluído com sucesso!');
+            queryClient.invalidateQueries({ queryKey: ['produtos'] });
+            setShowModal(false);
+            setEditTarget(null);
+            setForm(FORM_EMPTY);
+        },
+        onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao excluir produto.')
+    });
+
+    const handleDelete = () => {
+        if (window.confirm('Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.')) {
+            deleteMutation.mutate();
+        }
+    };
+
     const ajustarMutation = useMutation({
         mutationFn: async () => {
             if (!ajusteModal) return;
@@ -321,6 +342,16 @@ export default function Estoque() {
                             </div>
                         </div>
                         <div className="flex gap-md p-md border-t border-outline-variant">
+                            {editTarget && (
+                                <button 
+                                    onClick={handleDelete}
+                                    disabled={deleteMutation.isPending}
+                                    className="btn-secondary flex-none text-error hover:bg-error-container hover:text-error border-transparent px-3"
+                                    title="Excluir Produto"
+                                >
+                                    <span className="material-symbols-outlined">delete</span>
+                                </button>
+                            )}
                             <button onClick={() => setShowModal(false)} className="btn-secondary flex-1">Cancelar</button>
                             <button
                                 onClick={() => saveMutation.mutate()}
