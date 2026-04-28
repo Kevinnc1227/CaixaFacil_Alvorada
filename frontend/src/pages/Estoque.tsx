@@ -29,6 +29,10 @@ export default function Estoque() {
     const [editTarget, setEditTarget] = useState<Produto | null>(null);
     const [form, setForm] = useState(FORM_EMPTY);
 
+    // Filtros da tabela
+    const [filtroStatus, setFiltroStatus] = useState<'TODOS' | 'CRITICO' | 'ESGOTADO'>('TODOS');
+    const [filtroCategoria, setFiltroCategoria] = useState<string>('TODAS');
+
     // Ajuste de estoque
     const [ajusteModal, setAjusteModal] = useState<Produto | null>(null);
     const [ajusteTipo, setAjusteTipo] = useState<'ENTRADA' | 'SAIDA'>('ENTRADA');
@@ -47,6 +51,14 @@ export default function Estoque() {
     const criticos = stock.filter((s: Produto) => s.qtdEstoque <= s.qtdMinima && s.qtdEstoque > 0).length;
     const esgotados = stock.filter((s: Produto) => s.qtdEstoque <= 0).length;
     const categorias = new Set(stock.map((s: Produto) => s.categoria)).size;
+    const listaCategorias = Array.from(new Set(stock.map((s: Produto) => s.categoria))) as string[];
+
+    const filteredStock = stock.filter((s: Produto) => {
+        if (filtroStatus === 'CRITICO' && !(s.qtdEstoque <= s.qtdMinima && s.qtdEstoque > 0)) return false;
+        if (filtroStatus === 'ESGOTADO' && s.qtdEstoque <= 0 === false) return false; // Fixed: esgotado check
+        if (filtroCategoria !== 'TODAS' && s.categoria !== filtroCategoria) return false;
+        return true;
+    });
 
     const saveMutation = useMutation({
         mutationFn: async () => {
@@ -132,18 +144,35 @@ export default function Estoque() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-2">
                 {[
-                    { label: 'Total Itens', value: totalItens, icon: 'inventory_2', color: 'primary' },
-                    { label: 'Estoque Crítico', value: criticos, icon: 'warning', color: 'error' },
-                    { label: 'Esgotados', value: esgotados, icon: 'production_quantity_limits', color: 'secondary' },
-                    { label: 'Categorias', value: categorias, icon: 'category', color: 'on-surface' },
+                    { id: 'TODOS', label: 'Total Itens', value: totalItens, icon: 'inventory_2', color: 'primary' },
+                    { id: 'CRITICO', label: 'Estoque Crítico', value: criticos, icon: 'warning', color: 'error' },
+                    { id: 'ESGOTADO', label: 'Esgotados', value: esgotados, icon: 'production_quantity_limits', color: 'secondary' },
+                    { id: 'CATEGORIAS', label: 'Categorias', value: categorias, icon: 'category', color: 'on-surface' },
                 ].map(card => (
-                    <div key={card.label} className="bg-surface p-md rounded-xl border border-outline-variant shadow-sm flex items-center gap-4">
+                    <div 
+                        key={card.label} 
+                        onClick={() => card.id !== 'CATEGORIAS' ? setFiltroStatus(card.id as any) : null}
+                        className={`bg-surface p-md rounded-xl border ${card.id !== 'CATEGORIAS' && filtroStatus === card.id ? `border-${card.color} ring-2 ring-${card.color}/20` : 'border-outline-variant'} shadow-sm flex items-center gap-4 ${card.id !== 'CATEGORIAS' ? 'cursor-pointer hover:bg-surface-container-low transition-all' : ''}`}
+                    >
                         <div className={`bg-${card.color}-container p-3 rounded-full text-${card.color}`}>
                             <span className="material-symbols-outlined">{card.icon}</span>
                         </div>
-                        <div>
-                            <p className="text-xs text-on-surface-variant font-label-bold uppercase">{card.label}</p>
-                            <p className={`text-2xl font-bold text-${card.color}`}>{isLoading ? '-' : card.value}</p>
+                        <div className="flex-1 w-full min-w-0">
+                            <p className="text-xs text-on-surface-variant font-label-bold uppercase truncate">{card.label}</p>
+                            {card.id === 'CATEGORIAS' ? (
+                                <select 
+                                    className="bg-transparent text-xl font-bold text-on-surface outline-none cursor-pointer mt-1 w-full truncate"
+                                    value={filtroCategoria}
+                                    onChange={(e) => setFiltroCategoria(e.target.value)}
+                                >
+                                    <option value="TODAS">Todas ({categorias})</option>
+                                    {listaCategorias.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <p className={`text-2xl font-bold text-${card.color}`}>{isLoading ? '-' : card.value}</p>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -163,12 +192,12 @@ export default function Estoque() {
                         <tbody>
                             {isLoading ? (
                                 <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">Carregando estoque...</td></tr>
-                            ) : stock.length === 0 ? (
+                            ) : filteredStock.length === 0 ? (
                                 <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">
                                     <span className="material-symbols-outlined text-4xl block mb-2 opacity-30">inventory_2</span>
-                                    Nenhum produto cadastrado. Clique em "Novo Produto" para começar.
+                                    {stock.length === 0 ? 'Nenhum produto cadastrado. Clique em "Novo Produto" para começar.' : 'Nenhum produto encontrado com os filtros atuais.'}
                                 </td></tr>
-                            ) : stock.map((s: Produto) => {
+                            ) : filteredStock.map((s: Produto) => {
                                 const criticallyLow = s.qtdEstoque > 0 && s.qtdEstoque <= s.qtdMinima;
                                 return (
                                     <tr key={s.id} className={`hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/30 ${!s.ativo ? 'opacity-40' : ''}`}>
