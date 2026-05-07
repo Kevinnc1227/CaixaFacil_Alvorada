@@ -201,74 +201,137 @@ export default function Estoque() {
 
             <div className="flex-1 bg-surface rounded-xl shadow-sm border border-outline-variant overflow-hidden flex flex-col">
                 <div className="flex-1 overflow-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-surface-container-low sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant">Produto / Categoria</th>
-                                <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant">Preço</th>
-                                <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant text-center">Em Estoque</th>
-                                <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant text-right">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {isLoading ? (
-                                <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">Carregando estoque...</td></tr>
-                            ) : filteredStock.length === 0 ? (
-                                <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">
-                                    <span className="material-symbols-outlined text-4xl block mb-2 opacity-30">inventory_2</span>
-                                    {stock.length === 0 ? 'Nenhum produto cadastrado. Clique em "Novo Produto" para começar.' : 'Nenhum produto encontrado com os filtros atuais.'}
-                                </td></tr>
-                            ) : filteredStock.map((s: Produto) => {
-                                const criticallyLow = s.qtdEstoque > 0 && s.qtdEstoque <= s.qtdMinima;
-                                return (
-                                    <tr key={s.id} className={`hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/30 ${!s.ativo ? 'opacity-40' : ''}`}>
-                                        <td className="p-4">
+                    {/* Desktop View (Table) */}
+                    <div className="hidden md:block">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-surface-container-low sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant">Produto / Categoria</th>
+                                    <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant">Preço</th>
+                                    <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant text-center">Em Estoque</th>
+                                    <th className="p-4 font-label-bold text-on-surface-variant border-b border-outline-variant text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">Carregando estoque...</td></tr>
+                                ) : filteredStock.length === 0 ? (
+                                    <tr><td colSpan={4} className="p-8 text-center text-on-surface-variant">
+                                        <span className="material-symbols-outlined text-4xl block mb-2 opacity-30">inventory_2</span>
+                                        {stock.length === 0 ? 'Nenhum produto cadastrado. Clique em "Novo Produto" para começar.' : 'Nenhum produto encontrado com os filtros atuais.'}
+                                    </td></tr>
+                                ) : filteredStock.map((s: Produto) => {
+                                    const criticallyLow = s.qtdEstoque > 0 && s.qtdEstoque <= s.qtdMinima;
+                                    return (
+                                        <tr key={s.id} className={`hover:bg-surface-container-lowest transition-colors border-b border-outline-variant/30 ${!s.ativo ? 'opacity-40' : ''}`}>
+                                            <td className="p-4">
+                                                <div className="font-medium text-on-surface flex items-center gap-2">
+                                                    {s.nome}
+                                                    {!s.ativo && <span className="text-[10px] bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full">INATIVO</span>}
+                                                </div>
+                                                <div className="text-xs text-on-surface-variant mt-0.5">{s.categoria}</div>
+                                            </td>
+                                            <td className="p-4 text-on-surface-variant">
+                                                {s.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <span className={`font-bold text-lg ${s.qtdEstoque === 0 ? 'text-error' : criticallyLow ? 'text-secondary' : 'text-on-surface'}`}>
+                                                    {s.qtdEstoque}
+                                                </span>
+                                                <span className="text-xs text-on-surface-variant ml-1">un.</span>
+                                                {criticallyLow && <div className="text-[10px] text-secondary">⚠ Mín: {s.qtdMinima}</div>}
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex gap-2 justify-end">
+                                                    <button
+                                                        onClick={() => openAjuste(s, 'ENTRADA')}
+                                                        className="btn-secondary p-2 rounded-lg hover:bg-primary-container hover:text-primary transition-colors"
+                                                        title="Dar Entrada (+)"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">add</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openAjuste(s, 'SAIDA')}
+                                                        className="btn-secondary p-2 rounded-lg hover:bg-error-container hover:text-error transition-colors"
+                                                        title="Dar Saída (-)"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">remove</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openEdit(s)}
+                                                        className="btn-secondary p-2 rounded-lg ml-1"
+                                                        title="Editar Produto"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile View (Cards) */}
+                    <div className="md:hidden flex flex-col p-4 gap-4">
+                        {isLoading ? (
+                            <div className="p-8 text-center text-on-surface-variant">Carregando estoque...</div>
+                        ) : filteredStock.length === 0 ? (
+                            <div className="p-8 text-center text-on-surface-variant border border-outline-variant rounded-xl">
+                                <span className="material-symbols-outlined text-4xl block mb-2 opacity-30">inventory_2</span>
+                                {stock.length === 0 ? 'Nenhum produto cadastrado.' : 'Nenhum produto encontrado.'}
+                            </div>
+                        ) : filteredStock.map((s: Produto) => {
+                            const criticallyLow = s.qtdEstoque > 0 && s.qtdEstoque <= s.qtdMinima;
+                            return (
+                                <div key={s.id} className={`bg-surface-container border border-outline-variant p-4 rounded-xl shadow-sm flex flex-col gap-3 ${!s.ativo ? 'opacity-40' : ''}`}>
+                                    <div className="flex justify-between items-start">
+                                        <div>
                                             <div className="font-medium text-on-surface flex items-center gap-2">
                                                 {s.nome}
                                                 {!s.ativo && <span className="text-[10px] bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full">INATIVO</span>}
                                             </div>
                                             <div className="text-xs text-on-surface-variant mt-0.5">{s.categoria}</div>
-                                        </td>
-                                        <td className="p-4 text-on-surface-variant">
+                                        </div>
+                                        <div className="font-bold text-on-surface">
                                             {s.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                        </td>
-                                        <td className="p-4 text-center">
-                                            <span className={`font-bold text-lg ${s.qtdEstoque === 0 ? 'text-error' : criticallyLow ? 'text-secondary' : 'text-on-surface'}`}>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-end border-t border-outline-variant/50 pt-3">
+                                        <div>
+                                            <div className="text-xs text-on-surface-variant mb-1">Estoque</div>
+                                            <span className={`font-bold text-xl ${s.qtdEstoque === 0 ? 'text-error' : criticallyLow ? 'text-secondary' : 'text-on-surface'}`}>
                                                 {s.qtdEstoque}
                                             </span>
                                             <span className="text-xs text-on-surface-variant ml-1">un.</span>
                                             {criticallyLow && <div className="text-[10px] text-secondary">⚠ Mín: {s.qtdMinima}</div>}
-                                        </td>
-                                        <td className="p-4 text-right">
-                                            <div className="flex gap-2 justify-end">
-                                                <button
-                                                    onClick={() => openAjuste(s, 'ENTRADA')}
-                                                    className="btn-secondary p-2 rounded-lg hover:bg-primary-container hover:text-primary transition-colors"
-                                                    title="Dar Entrada (+)"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">add</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => openAjuste(s, 'SAIDA')}
-                                                    className="btn-secondary p-2 rounded-lg hover:bg-error-container hover:text-error transition-colors"
-                                                    title="Dar Saída (-)"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">remove</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => openEdit(s)}
-                                                    className="btn-secondary p-2 rounded-lg ml-1"
-                                                    title="Editar Produto"
-                                                >
-                                                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => openAjuste(s, 'ENTRADA')}
+                                                className="bg-primary-container text-primary p-2 rounded-lg"
+                                            >
+                                                <span className="material-symbols-outlined text-[18px]">add</span>
+                                            </button>
+                                            <button
+                                                onClick={() => openAjuste(s, 'SAIDA')}
+                                                className="bg-error-container text-error p-2 rounded-lg"
+                                            >
+                                                <span className="material-symbols-outlined text-[18px]">remove</span>
+                                            </button>
+                                            <button
+                                                onClick={() => openEdit(s)}
+                                                className="bg-surface-variant text-on-surface-variant p-2 rounded-lg"
+                                            >
+                                                <span className="material-symbols-outlined text-[18px]">edit</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
@@ -308,6 +371,7 @@ export default function Estoque() {
                                     <input
                                         className="input"
                                         type="number"
+                                        inputMode="decimal"
                                         step="0.01"
                                         min="0"
                                         placeholder="0,00"
@@ -322,6 +386,7 @@ export default function Estoque() {
                                     <input
                                         className="input"
                                         type="number"
+                                        inputMode="numeric"
                                         min="0"
                                         placeholder="0"
                                         value={form.qtdEstoque}
@@ -333,6 +398,7 @@ export default function Estoque() {
                                     <input
                                         className="input"
                                         type="number"
+                                        inputMode="numeric"
                                         min="0"
                                         placeholder="5"
                                         value={form.qtdMinima}
@@ -390,6 +456,7 @@ export default function Estoque() {
                                 <input
                                     className="input text-center text-xl font-bold"
                                     type="number"
+                                    inputMode="numeric"
                                     min="1"
                                     placeholder="0"
                                     value={ajusteQtd}
