@@ -9,6 +9,8 @@ import Caixa from './pages/Caixa';
 import Suporte from './pages/Suporte';
 import Config from './pages/Config';
 import ReservaCampo from './pages/ReservaCampo';
+import OperatorManagement from './pages/OperatorManagement';
+import AdminRoute from './components/layout/AdminRoute';
 
 function App() {
   return (
@@ -23,7 +25,14 @@ function App() {
           <Route path="fichas" element={<Fichas />} />
           <Route path="caixa" element={<Caixa />} />
           <Route path="suporte" element={<Suporte />} />
-          <Route path="config" element={<Config />} />
+          <Route path="config">
+            <Route index element={<Config />} />
+            <Route path="operadores" element={
+              <AdminRoute>
+                <OperatorManagement />
+              </AdminRoute>
+            } />
+          </Route>
           <Route path="reserva-campo" element={<ReservaCampo />} />
         </Route>
       </Routes>
