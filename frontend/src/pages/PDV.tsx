@@ -288,7 +288,6 @@ export default function PDV() {
                         </button>
                     </div>
                     </div>
-                </div>
             </aside>
 
             {/* Modal Lançar na Ficha */}
