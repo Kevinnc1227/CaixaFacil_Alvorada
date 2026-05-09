@@ -107,18 +107,18 @@ export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<v
             return;
         }
 
-        await db.transaction(async (tx) => {
+        db.transaction((tx) => {
             // Registrar log de auditoria
-            await tx.insert(ajustesEstoque).values({
+            tx.insert(ajustesEstoque).values({
                 produtoId,
                 usuarioId,
                 quantidade,
                 tipo,
                 motivo
-            });
+            }).run();
 
             // Atualizar no produto real
-            await tx.update(produtos).set({ qtdEstoque: novaQtd }).where(eq(produtos.id, produtoId));
+            tx.update(produtos).set({ qtdEstoque: novaQtd }).where(eq(produtos.id, produtoId)).run();
         });
 
         res.json({ message: 'Estoque ajustado com sucesso', novoEstoque: novaQtd });

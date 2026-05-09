@@ -65,9 +65,9 @@ export const createReserva = async (req: AuthRequest, res: Response): Promise<vo
         let novaReservaId: number;
         let novoTicketId: number;
 
-        await db.transaction(async (tx) => {
+        db.transaction((tx) => {
             // 2. Criar a reserva (ticketId ainda NULL)
-            const [reservaCriada] = await tx.insert(reservasCampo).values({
+            const reservaCriada = tx.insert(reservasCampo).values({
                 clienteId,
                 dataReserva,
                 horaInicio,
@@ -75,7 +75,7 @@ export const createReserva = async (req: AuthRequest, res: Response): Promise<vo
                 valorTotal: Number(valorTotal),
                 status: 'CONFIRMADA',
                 usuarioId,
-            }).returning();
+            }).returning().get();
 
             novaReservaId = reservaCriada.id;
 
@@ -87,27 +87,28 @@ export const createReserva = async (req: AuthRequest, res: Response): Promise<vo
                 `Valor: R$ ${Number(valorTotal).toFixed(2)}\n` +
                 `Reserva ID: #${reservaCriada.id}`;
 
-            const [ticketCriado] = await tx.insert(tickets).values({
+            const ticketCriado = tx.insert(tickets).values({
                 usuarioId,
                 titulo: tituloTicket,
                 categoria: 'DUVIDA',   // Categoria neutra — indica atendimento de serviço
                 descricao: descricaoTicket,
                 status: 'ABERTO',
-            }).returning();
+            }).returning().get();
 
             novoTicketId = ticketCriado.id;
 
             // 4. Adicionar a primeira mensagem do ticket (descrição da reserva)
-            await tx.insert(mensagensTicket).values({
+            tx.insert(mensagensTicket).values({
                 ticketId: ticketCriado.id,
                 autorId: usuarioId,
                 mensagem: descricaoTicket,
-            });
+            }).run();
 
             // 5. Atualizar o ticketId na reserva — OneToOne
-            await tx.update(reservasCampo)
+            tx.update(reservasCampo)
                 .set({ ticketId: ticketCriado.id })
-                .where(eq(reservasCampo.id, reservaCriada.id));
+                .where(eq(reservasCampo.id, reservaCriada.id))
+                .run();
         });
 
         res.status(201).json({

@@ -18,38 +18,38 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
         // Verificar caixa aberto do dia? 
         // Regra: Não se fecha o caixa no meio do dia, apenas no final.
 
-        await db.transaction(async (tx) => {
+        db.transaction((tx) => {
             // 1. Criar pedido
-            const [novoPedido] = await tx.insert(pedidos).values({
+            const novoPedido = tx.insert(pedidos).values({
                 usuarioId,
                 tipo,
                 status: tipo === 'PAGAR_AGORA' ? 'PAGO' : 'LANCADO_FICHA',
                 total,
                 fichaId: tipo === 'LANCAR_FICHA' ? fichaId : null
-            }).returning();
+            }).returning().get();
 
             // 2. Inserir itens e decrementar estoque
             for (const item of itens) {
-                await tx.insert(itensPedido).values({
+                tx.insert(itensPedido).values({
                     pedidoId: novoPedido.id,
                     produtoId: item.produtoId,
                     quantidade: item.quantidade,
                     precoUnitario: item.precoUnitario
-                });
+                }).run();
 
                 // Decrementar estoque do produto
-                const produtoDb = await tx.select().from(produtos).where(eq(produtos.id, item.produtoId)).get();
+                const produtoDb = tx.select().from(produtos).where(eq(produtos.id, item.produtoId)).get();
                 if (produtoDb) {
                     const newQtd = Math.max(0, produtoDb.qtdEstoque - item.quantidade);
-                    await tx.update(produtos).set({ qtdEstoque: newQtd }).where(eq(produtos.id, produtoDb.id));
+                    tx.update(produtos).set({ qtdEstoque: newQtd }).where(eq(produtos.id, produtoDb.id)).run();
                 }
             }
 
             // 3. Se for na ficha, acumular valor
             if (tipo === 'LANCAR_FICHA' && fichaId) {
-                const fichaDb = await tx.select().from(fichas).where(eq(fichas.id, fichaId)).get();
+                const fichaDb = tx.select().from(fichas).where(eq(fichas.id, fichaId)).get();
                 if (fichaDb) {
-                    await tx.update(fichas).set({ totalAcumulado: fichaDb.totalAcumulado + total }).where(eq(fichas.id, fichaId));
+                    tx.update(fichas).set({ totalAcumulado: fichaDb.totalAcumulado + total }).where(eq(fichas.id, fichaId)).run();
                 }
             }
         });
