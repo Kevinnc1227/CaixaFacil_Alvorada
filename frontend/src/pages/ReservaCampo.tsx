@@ -36,6 +36,8 @@ const STATUS_META: Record<string, { label: string; color: string; icon: string }
 export default function ReservaCampo() {
     const queryClient = useQueryClient();
     const [showModal, setShowModal] = useState(false);
+    const [isNovoCliente, setIsNovoCliente] = useState(false);
+    const [novoClienteNome, setNovoClienteNome] = useState('');
     const [form, setForm] = useState({
         clienteId: '',
         dataReserva: new Date().toISOString().split('T')[0],
@@ -57,24 +59,39 @@ export default function ReservaCampo() {
 
     // ── Mutation: criar reserva ──
     const createMutation = useMutation({
-        mutationFn: async () => api.post('/reservas-campo', {
-            clienteId: Number(form.clienteId),
-            dataReserva: form.dataReserva,
-            horaInicio: form.horaInicio,
-            horaFim: form.horaFim,
-            valorTotal: Number(form.valorTotal),
-        }),
+        mutationFn: async () => {
+            let finalClienteId = Number(form.clienteId);
+
+            if (isNovoCliente) {
+                if (!novoClienteNome.trim()) throw new Error('Nome do cliente é obrigatório para o cadastro rápido');
+                const clienteRes = await api.post('/clientes', {
+                    nomeCompleto: novoClienteNome.trim()
+                });
+                finalClienteId = clienteRes.data.cliente.id;
+            }
+
+            return api.post('/reservas-campo', {
+                clienteId: finalClienteId,
+                dataReserva: form.dataReserva,
+                horaInicio: form.horaInicio,
+                horaFim: form.horaFim,
+                valorTotal: Number(form.valorTotal),
+            });
+        },
         onSuccess: (res) => {
             const { reservaId, ticketId } = res.data;
             toast.success(`Reserva #${reservaId} criada! Ticket #${ticketId} aberto automaticamente.`, { duration: 5000 });
             queryClient.invalidateQueries({ queryKey: ['reservasCampo'] });
             queryClient.invalidateQueries({ queryKey: ['tickets'] });
             queryClient.invalidateQueries({ queryKey: ['caixaRelatorio'] });
+            queryClient.invalidateQueries({ queryKey: ['clientes'] });
             setShowModal(false);
+            setIsNovoCliente(false);
+            setNovoClienteNome('');
             setForm({ clienteId: '', dataReserva: new Date().toISOString().split('T')[0], horaInicio: '08:00', horaFim: '09:00', valorTotal: '' });
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.error || 'Erro ao criar reserva');
+            toast.error(err?.response?.data?.error || err.message || 'Erro ao criar reserva');
         },
     });
 
@@ -277,18 +294,42 @@ export default function ReservaCampo() {
 
                             {/* Cliente */}
                             <div className="flex flex-col gap-1.5">
-                                <label htmlFor="sel-cliente" className="text-xs font-semibold text-on-surface-variant uppercase">Cliente *</label>
-                                <select
-                                    id="sel-cliente"
-                                    value={form.clienteId}
-                                    onChange={e => setForm(f => ({ ...f, clienteId: e.target.value }))}
-                                    className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                                >
-                                    <option value="">— Selecione um cliente —</option>
-                                    {clientes.map(c => (
-                                        <option key={c.id} value={c.id}>{c.nomeCompleto}</option>
-                                    ))}
-                                </select>
+                                <div className="flex justify-between items-end">
+                                    <label className="text-xs font-semibold text-on-surface-variant uppercase">Cliente *</label>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => {
+                                            setIsNovoCliente(!isNovoCliente);
+                                            setForm(f => ({ ...f, clienteId: '' }));
+                                            setNovoClienteNome('');
+                                        }}
+                                        className="text-xs text-sky-400 hover:text-sky-300 font-semibold transition-colors"
+                                    >
+                                        {isNovoCliente ? 'Selecionar Existente' : '+ Cadastro Rápido'}
+                                    </button>
+                                </div>
+                                
+                                {isNovoCliente ? (
+                                    <input
+                                        type="text"
+                                        placeholder="Digite o nome do cliente..."
+                                        value={novoClienteNome}
+                                        onChange={e => setNovoClienteNome(e.target.value)}
+                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                                    />
+                                ) : (
+                                    <select
+                                        id="sel-cliente"
+                                        value={form.clienteId}
+                                        onChange={e => setForm(f => ({ ...f, clienteId: e.target.value }))}
+                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    >
+                                        <option value="">— Selecione um cliente —</option>
+                                        {clientes.map(c => (
+                                            <option key={c.id} value={c.id}>{c.nomeCompleto}</option>
+                                        ))}
+                                    </select>
+                                )}
                             </div>
 
                             {/* Data */}
@@ -359,7 +400,7 @@ export default function ReservaCampo() {
                                 </button>
                                 <button
                                     id="btn-confirmar-reserva"
-                                    disabled={!form.clienteId || !form.dataReserva || !form.valorTotal || createMutation.isPending}
+                                    disabled={(isNovoCliente ? !novoClienteNome.trim() : !form.clienteId) || !form.dataReserva || !form.valorTotal || createMutation.isPending}
                                     onClick={() => createMutation.mutate()}
                                     className="flex-1 py-2 rounded-lg bg-emerald-500 text-white font-semibold text-sm hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                                 >
