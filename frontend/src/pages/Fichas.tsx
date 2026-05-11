@@ -75,7 +75,10 @@ export default function Fichas() {
             setShowExcluir(null);
             setAdminAuth({ email: '', password: '' });
         },
-        onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao excluir cliente. Verifique as credenciais de admin.')
+        onError: (e: any) => {
+            const msg = e.response?.data?.error || `Erro ${e.response?.status || 'desconhecido'}: Falha na autorização ou servidor.`;
+            toast.error(msg);
+        }
     });
 
     const filteredFichas = fichasData.filter((f: Ficha) => {
