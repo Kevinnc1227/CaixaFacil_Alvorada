@@ -15,6 +15,7 @@ export const produtos = sqliteTable('produtos', {
     nome: text('nome').notNull(),
     categoria: text('categoria').notNull(),
     precoVenda: real('preco_venda').notNull(),
+    precoCusto: real('preco_custo').notNull().default(0), // Custo de aquisição para calcular lucro líquido
     qtdEstoque: integer('qtd_estoque').notNull().default(0),
     qtdMinima: integer('qtd_minima').notNull().default(0),
     ativo: integer('ativo', { mode: 'boolean' }).notNull().default(true),
@@ -81,6 +82,10 @@ export const caixas = sqliteTable('caixas', {
     data: integer('data', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
     totalVendas: real('total_vendas').notNull(),
     totalFichas: real('total_fichas').notNull(),
+    totalReservas: real('total_reservas').notNull().default(0),
+    totalBruto: real('total_bruto').notNull().default(0),
+    totalCusto: real('total_custo').notNull().default(0),   // Custo de aquisição dos produtos vendidos
+    lucroLiquido: real('lucro_liquido').notNull().default(0), // totalBruto - totalCusto
     fechadoPor: integer('fechado_por').notNull().references(() => usuarios.id),
     fechadoEm: integer('fechado_em', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 });
