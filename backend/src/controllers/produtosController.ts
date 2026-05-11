@@ -31,12 +31,13 @@ export const listProdutos = async (req: Request, res: Response): Promise<void> =
 
 export const createProduto = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { nome, categoria, precoVenda, qtdEstoque, qtdMinima } = req.body;
+        const { nome, categoria, precoVenda, precoCusto, qtdEstoque, qtdMinima } = req.body;
 
         const result = await db.insert(produtos).values({
             nome,
             categoria,
             precoVenda,
+            precoCusto: precoCusto ?? 0,
             qtdEstoque,
             qtdMinima,
         }).returning();
@@ -51,10 +52,10 @@ export const createProduto = async (req: Request, res: Response): Promise<void> 
 export const updateProduto = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = Number(req.params.id);
-        const { nome, categoria, precoVenda, qtdMinima, ativo } = req.body;
+        const { nome, categoria, precoVenda, precoCusto, qtdMinima, ativo } = req.body;
 
         const result = await db.update(produtos)
-            .set({ nome, categoria, precoVenda, qtdMinima, ativo })
+            .set({ nome, categoria, precoVenda, precoCusto: precoCusto ?? 0, qtdMinima, ativo })
             .where(eq(produtos.id, id))
             .returning();
 
