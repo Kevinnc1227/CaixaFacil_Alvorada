@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import { db } from '../db/db';
-import { clientes, fichas, pedidos } from '../db/schema';
+import { clientes, fichas, pedidos, usuarios, reservasCampo } from '../db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
@@ -104,5 +105,48 @@ export const fecharFicha = async (req: AuthRequest, res: Response): Promise<void
         res.json(fichaAtualizada);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao fechar ficha' });
+    }
+};
+
+export const deleteCliente = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const clienteId = Number(req.params.id);
+        const { adminEmail, adminPassword } = req.body;
+
+        if (!adminEmail || !adminPassword) {
+            res.status(400).json({ error: 'Credenciais administrativas são necessárias para esta ação' });
+            return;
+        }
+
+        // 1. Validar Admin
+        const admin = await db.select().from(usuarios)
+            .where(eq(usuarios.email, adminEmail))
+            .get();
+
+        if (!admin || admin.perfil !== 'ADMINISTRADOR' || !admin.ativo) {
+            res.status(403).json({ error: 'Acesso negado. Apenas administradores ativos podem excluir clientes.' });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(adminPassword, admin.senhaHash);
+        if (!isPasswordValid) {
+            res.status(401).json({ error: 'Senha administrativa incorreta' });
+            return;
+        }
+
+        // 2. Executar deleção em cascata
+        await db.transaction(async (tx) => {
+            // Deletar fichas do cliente
+            await tx.delete(fichas).where(eq(fichas.clienteId, clienteId)).run();
+            // Deletar reservas do cliente
+            await tx.delete(reservasCampo).where(eq(reservasCampo.clienteId, clienteId)).run();
+            // Finalmente, deletar o cliente
+            await tx.delete(clientes).where(eq(clientes.id, clienteId)).run();
+        });
+
+        res.json({ message: 'Cliente e todos os seus registros foram excluídos com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir cliente:', error);
+        res.status(500).json({ error: 'Erro ao excluir cliente do sistema' });
     }
 };

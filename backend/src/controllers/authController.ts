@@ -55,3 +55,27 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: 'Erro interno no servidor' });
     }
 };
+
+export const verifyAdminCredentials = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { email, senha } = req.body;
+
+        const userRecord = await db.select().from(usuarios).where(eq(usuarios.email, email)).get();
+
+        if (!userRecord || userRecord.perfil !== 'ADMINISTRADOR' || !userRecord.ativo) {
+            res.status(401).json({ error: 'Credenciais administrativas inválidas ou permissão insuficiente' });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(senha, userRecord.senhaHash);
+
+        if (!isPasswordValid) {
+            res.status(401).json({ error: 'Credenciais administrativas inválidas' });
+            return;
+        }
+
+        res.json({ success: true, message: 'Administrador verificado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao verificar credenciais' });
+    }
+};
