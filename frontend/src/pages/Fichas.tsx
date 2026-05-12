@@ -138,22 +138,22 @@ export default function Fichas() {
                         </div>
                         <div className="p-5 flex flex-col gap-4">
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Nome Completo *</label>
-                                <input className="cf-input" placeholder="Ex: João da Silva" value={novoForm.nomeCompleto} onChange={e => setNovoForm(f => ({ ...f, nomeCompleto: e.target.value }))} autoFocus />
+                                <label htmlFor="ficha-nome" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Nome Completo *</label>
+                                <input id="ficha-nome" className="cf-input" placeholder="Ex: João da Silva" value={novoForm.nomeCompleto} onChange={e => setNovoForm(f => ({ ...f, nomeCompleto: e.target.value }))} autoFocus />
                             </div>
                             <div className="flex gap-4">
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">CPF / Doc</label>
-                                    <input className="cf-input" placeholder="000.000.000-00" value={novoForm.cpf} onChange={e => setNovoForm(f => ({ ...f, cpf: e.target.value }))} />
+                                    <label htmlFor="ficha-cpf" className="text-xs font-mono uppercase tracking-widest text-cf-muted">CPF / Doc</label>
+                                    <input id="ficha-cpf" className="cf-input" placeholder="000.000.000-00" value={novoForm.cpf} onChange={e => setNovoForm(f => ({ ...f, cpf: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Telefone</label>
-                                    <input className="cf-input" placeholder="(47) 99999-9999" value={novoForm.telefone} onChange={e => setNovoForm(f => ({ ...f, telefone: e.target.value }))} />
+                                    <label htmlFor="ficha-telefone" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Telefone</label>
+                                    <input id="ficha-telefone" className="cf-input" placeholder="(47) 99999-9999" value={novoForm.telefone} onChange={e => setNovoForm(f => ({ ...f, telefone: e.target.value }))} />
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Observações</label>
-                                <textarea className="cf-input h-20 resize-none" placeholder="Observações opcionais..." value={novoForm.observacoes} onChange={e => setNovoForm(f => ({ ...f, observacoes: e.target.value }))} />
+                                <label htmlFor="ficha-obs" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Observações</label>
+                                <textarea id="ficha-obs" className="cf-input h-20 resize-none" placeholder="Observações opcionais..." value={novoForm.observacoes} onChange={e => setNovoForm(f => ({ ...f, observacoes: e.target.value }))} />
                             </div>
                             <div className="bg-cf-accent-glow border border-cf-accent/20 rounded-lg p-3 flex items-center gap-2 text-xs text-cf-accent">
                                 <span className="material-symbols-outlined text-[16px]">info</span>
@@ -189,7 +189,7 @@ export default function Fichas() {
                                 <p className="text-xs text-cf-muted font-mono mt-1 uppercase tracking-widest">Total a receber</p>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Forma de Pagamento</label>
+                                <label htmlFor="ficha-forma-pgto" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Forma de Pagamento</label>
                                 <div className="grid grid-cols-3 gap-2">
                                     {FORMAS.map(f => (
                                         <button key={f} onClick={() => setFormaPgto(f)}
