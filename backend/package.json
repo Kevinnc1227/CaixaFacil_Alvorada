@@ -15,6 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@types/uuid": "^10.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.9.0",
     "cors": "^2.8.6",
@@ -24,7 +25,8 @@
     "jsonwebtoken": "^9.0.3",
     "lucia": "^3.2.2",
     "oslo": "^1.2.1",
-    "text-encoding": "^0.7.0"
+    "text-encoding": "^0.7.0",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

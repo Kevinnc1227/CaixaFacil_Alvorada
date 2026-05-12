@@ -1,101 +1,136 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
-import { authApi } from '../api/api';
+import api, { STORAGE_KEYS } from '../api/api';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const [identificador, setIdentificador] = useState(''); // email ou username
+    const [senha, setSenha] = useState('');
+    const [erro, setErro] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const loginMutation = useMutation({
-        mutationFn: async () => {
-            const res = await authApi.post('/login', {
-                email,
-                senha: password
-            });
-            return res.data;
-        },
-        onSuccess: (data) => {
-            if (data.token) localStorage.setItem('alvorada_jwt', data.token);
-            if (data.user) localStorage.setItem('alvorada_user', JSON.stringify(data.user));
-            toast.success('Login aprovado!');
-            navigate('/pdv');
-        },
-        onError: (error: any) => {
-            const message = error.response?.data?.error || 'Falha ao autenticar. Tente novamente.';
-            toast.error(message);
-        }
-    });
-
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (email && password) {
-            loginMutation.mutate();
+        setErro('');
+        setLoading(true);
+
+        try {
+            const { data } = await api.post('/auth/login', { identificador, senha });
+
+            localStorage.setItem(STORAGE_KEYS.TOKEN, data.token);
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+
+            // Super Admin → painel admin; demais → dashboard normal
+            if (data.user.perfil === 'SUPERADMIN') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
+        } catch (err: any) {
+            setErro(err.response?.data?.error || 'Erro ao fazer login. Verifique suas credenciais.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="flex h-screen bg-background items-center justify-center p-md">
-            <div className="card w-full max-w-md p-lg shadow-2xl relative overflow-hidden">
+        <div className="relative min-h-screen flex items-center justify-center bg-[var(--cf-bg)] p-6 overflow-hidden cf-noise">
+            {/* Monumental Background Text */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 select-none overflow-hidden">
+                <span 
+                    className="font-black whitespace-nowrap"
+                    style={{ 
+                        WebkitTextStroke: '2px var(--cf-border-strong)',
+                        color: 'transparent',
+                        fontSize: 'clamp(8rem, 20vw, 24rem)',
+                        letterSpacing: '-0.05em',
+                        lineHeight: '0.8'
+                    }}
+                >
+                    CAIXAFACIL
+                </span>
+            </div>
 
-                {/* Decorative background glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] aspect-square bg-secondary-container/20 rounded-full blur-[100px] pointer-events-none" />
-
-                <div className="relative z-10 flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant mb-4 shadow-inner">
-                        <span className="material-symbols-outlined text-white text-3xl">sports_soccer</span>
+            <div className="relative w-full max-w-lg z-10">
+                {/* Logo / Brand */}
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-4 mb-4">
+                        <div className="w-14 h-14 bg-[var(--cf-accent)] flex items-center justify-center font-black text-[var(--cf-bg)] text-2xl border-2 border-[var(--cf-accent)]">
+                            CF
+                        </div>
+                        <span className="text-4xl font-black tracking-tighter">
+                            <span className="text-[var(--cf-text)]">CAIXA</span><span className="text-[var(--cf-accent)]">FACIL</span>
+                        </span>
                     </div>
-                    <h1 className="font-display-lg text-display-lg text-primary text-center tracking-tight mb-2">CaixaFácil</h1>
-                    <p className="font-body-lg text-body-lg text-on-surface-variant text-center">Alvorada Esporte Clube</p>
+                    <p className="text-[var(--cf-muted)] text-xs tracking-[0.2em] uppercase font-bold">by K-HUB Soluções</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="relative z-10 flex flex-col gap-md">
-                    <div className="flex flex-col gap-xs">
-                        <label className="font-label-bold text-label-bold text-on-surface ml-1">E-mail de Acesso</label>
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
-                            <input
-                                type="email"
-                                required
-                                placeholder="operador@alvorada.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="input pl-10"
-                                disabled={loginMutation.isPending}
-                            />
-                        </div>
+                {/* Card de login */}
+                <form
+                    onSubmit={handleLogin}
+                    className="bg-[var(--cf-bg)] border-2 border-[var(--cf-border-strong)] p-8 sm:p-12 space-y-10"
+                >
+                    <div>
+                        <h1 className="text-2xl font-black text-[var(--cf-text)] tracking-tight uppercase">Acesso Restrito</h1>
+                        <p className="text-[var(--cf-muted)] text-sm mt-1">Insira suas credenciais para continuar.</p>
                     </div>
 
-                    <div className="flex flex-col gap-xs">
-                        <label className="font-label-bold text-label-bold text-on-surface ml-1">Senha</label>
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-[var(--cf-muted-light)] uppercase tracking-widest">
+                                E-mail ou usuário
+                            </label>
                             <input
+                                id="login-identificador"
+                                type="text"
+                                className="cf-input w-full bg-[var(--cf-bg)] rounded-none border-[var(--cf-border-strong)] focus:border-[var(--cf-accent)] focus:ring-0 transition-colors"
+                                placeholder="seu@email.com ou usuario"
+                                value={identificador}
+                                onChange={e => setIdentificador(e.target.value)}
+                                autoComplete="username"
+                                required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label className="block text-xs font-bold text-[var(--cf-muted-light)] uppercase tracking-widest">
+                                    Senha
+                                </label>
+                            </div>
+                            <input
+                                id="login-senha"
                                 type="password"
-                                required
+                                className="cf-input w-full bg-[var(--cf-bg)] rounded-none border-[var(--cf-border-strong)] focus:border-[var(--cf-accent)] focus:ring-0 transition-colors"
                                 placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="input pl-10"
-                                disabled={loginMutation.isPending}
+                                value={senha}
+                                onChange={e => setSenha(e.target.value)}
+                                autoComplete="current-password"
+                                required
                             />
                         </div>
                     </div>
 
-                    <button type="submit" disabled={loginMutation.isPending} className="btn-primary mt-4 group">
-                        {loginMutation.isPending ? 'Verificando...' : 'Entrar'}
-                        {!loginMutation.isPending && (
-                            <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
-                        )}
+                    {erro && (
+                        <div className="bg-[var(--cf-red-bg)] border border-[var(--cf-red)] p-4 text-sm text-[var(--cf-red)] font-medium">
+                            {erro}
+                        </div>
+                    )}
+
+                    <button
+                        id="login-submit"
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[var(--cf-accent)] text-[var(--cf-bg)] hover:bg-[var(--cf-accent-dim)] transition-colors py-5 px-6 font-black text-sm tracking-[0.1em] uppercase flex items-center justify-center gap-3 disabled:opacity-50 border-2 border-[var(--cf-accent)]"
+                    >
+                        {loading ? '[ AUTENTICANDO ]' : 'ACESSAR SISTEMA'}
                     </button>
                 </form>
 
-                <div className="relative z-10 text-center mt-8">
-                    <p className="text-xs text-on-surface-variant/50 font-lexend">
-                        Sistema de Gestão • Versão 1.0 MVP
-                    </p>
+                <div className="mt-8 text-center">
+                    <a href="/" className="inline-flex items-center text-xs font-black text-[var(--cf-muted-light)] hover:text-[var(--cf-accent)] uppercase tracking-[0.15em] transition-colors border-b-2 border-transparent hover:border-[var(--cf-accent)] pb-1">
+                        &lt; RETORNAR AO SITE
+                    </a>
                 </div>
             </div>
         </div>
