@@ -29,6 +29,7 @@ export const getSetupInfo = async (req: Request, res: Response): Promise<void> =
             avisoRecibo: org.avisoRecibo,
         });
     } catch (error) {
+        console.error('getSetupInfo error:', error);
         res.status(500).json({ error: 'Erro ao buscar informações de setup' });
     }
 };
@@ -63,6 +64,7 @@ export const completeSetup = async (req: Request, res: Response): Promise<void> 
 
         res.json({ message: 'Setup concluído com sucesso! Você já pode fazer login.' });
     } catch (error) {
+        console.error('completeSetup error:', error);
         res.status(500).json({ error: 'Erro ao concluir setup' });
     }
 };

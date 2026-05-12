@@ -30,6 +30,7 @@ export const getRelatorioCaixa = async (req: AuthRequest, res: Response): Promis
             }
         });
     } catch (error) {
+        console.error('getRelatorioCaixa error:', error);
         res.status(500).json({ error: 'Erro ao gerar relatório' });
     }
 };
@@ -49,6 +50,7 @@ export const fecharCaixa = async (req: AuthRequest, res: Response): Promise<void
 
         res.json(novoCaixa);
     } catch (error) {
+        console.error('fecharCaixa error:', error);
         res.status(500).json({ error: 'Erro ao fechar caixa' });
     }
 };
@@ -61,6 +63,7 @@ export const getHistoricoCaixas = async (req: AuthRequest, res: Response): Promi
             .orderBy(desc(caixas.id));
         res.json(historico);
     } catch (error) {
+        console.error('getHistoricoCaixas error:', error);
         res.status(500).json({ error: 'Erro ao buscar histórico' });
     }
 };

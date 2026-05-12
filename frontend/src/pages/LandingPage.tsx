@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useSpring, useMotionValueEvent, AnimatePresence } from 'motion/react';
 import { FileText, Package, Clock, CircleHelp, Lock, Ticket, Shield, Check, Plus, Menu, X } from 'lucide-react';
@@ -8,11 +8,11 @@ import './LandingPage.css';
 const CustomCursor = () => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (!globalThis.matchMedia('(pointer: fine)').matches) return;
     let rafId: number;
     let mx = 0, my = 0, cx = 0, cy = 0;
     const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
-    window.addEventListener('mousemove', onMove, { passive: true });
+    globalThis.addEventListener('mousemove', onMove, { passive: true });
     const tick = () => {
       cx += (mx - cx) * 0.15;
       cy += (my - cy) * 0.15;
@@ -21,7 +21,7 @@ const CustomCursor = () => {
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
-    return () => { window.removeEventListener('mousemove', onMove); cancelAnimationFrame(rafId); };
+    return () => { globalThis.removeEventListener('mousemove', onMove); cancelAnimationFrame(rafId); };
   }, []);
   return <div id="lp-cursor" ref={ref} />;
 };
@@ -41,7 +41,7 @@ const ScrollColorReveal = ({ children, className = '' }: { children: React.React
   useMotionValueEvent(scrollY, 'change', (latest) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const windowH = window.innerHeight;
+    const windowH = globalThis.innerHeight;
     const start = windowH * 0.85;
     const end = windowH * 0.2;
     const pct = Math.max(0, Math.min(100, ((start - rect.top) / (start - end)) * 100));
@@ -70,9 +70,9 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', fn, { passive: true });
-    return () => window.removeEventListener('scroll', fn);
+    const fn = () => setScrolled((globalThis.scrollY ?? 0) > 20);
+    globalThis.addEventListener('scroll', fn, { passive: true });
+    return () => globalThis.removeEventListener('scroll', fn);
   }, []);
 
   useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
@@ -86,7 +86,7 @@ const Navbar = () => {
     <>
       <nav className={`lp-nav${scrolled ? ' scrolled' : ''}`}>
         <div className="lp-nav-inner">
-          <button className="lp-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <button className="lp-logo" onClick={() => globalThis.scrollTo({ top: 0, behavior: 'smooth' })}>
             <span style={{ color: 'inherit' }}>Caixa</span><span style={{ color: 'var(--lp-amber)' }}>Facil</span>
           </button>
 
@@ -222,8 +222,8 @@ const Hero = () => (
               <p style={{ fontWeight: 600, marginTop: '0.2rem', marginBottom: 0 }}>Mesa 04</p>
             </div>
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {[['X-Burguer', 'R$ 18,00'], ['Coca-Cola', 'R$ 7,00']].map(([n, p], i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--lp-font-mono)', fontSize: '0.65rem', color: 'var(--lp-muted)' }}>
+              {[['X-Burguer', 'R$ 18,00'], ['Coca-Cola', 'R$ 7,00']].map(([n, p]) => (
+                <div key={n} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--lp-font-mono)', fontSize: '0.65rem', color: 'var(--lp-muted)' }}>
                   <span>{n}</span><span>{p}</span>
                 </div>
               ))}
@@ -261,8 +261,8 @@ const Hero = () => (
                 { name: 'X-Salada', price: 'R$ 16,00' },
                 { name: 'Cerveja Long Neck', price: 'R$ 12,00' },
                 { name: 'Porção Batata P', price: 'R$ 18,00' },
-              ].map((it, i) => (
-                <div key={i} className="lp-hcard-item">
+              ].map((it) => (
+                <div key={it.name} className="lp-hcard-item">
                   <span className="lp-hcard-item-name">{it.name}</span>
                   <span className="lp-hcard-item-price">{it.price}</span>
                 </div>
@@ -301,8 +301,8 @@ const Credibility = () => {
       <div className="lp-cred-track">
         {[0, 1].map(set => (
           <div key={set} className="lp-cred-set">
-            {items.map((item, i) => (
-              <span key={i} className={item === '·' ? 'lp-cred-sep' : ''}>{item}</span>
+            {items.map((item, itemIdx) => (
+              <span key={`${set}-${itemIdx}`} className={item === '·' ? 'lp-cred-sep' : ''}>{item}</span>
             ))}
           </div>
         ))}
@@ -330,9 +330,9 @@ const PainSection = () => (
       Você conhece essa história?
     </motion.h2>
     <div className="lp-pain-grid">
-      {PAINS.map((p, i) => (
+      {PAINS.map((p) => (
         <motion.div
-          key={i}
+          key={p.num}
           className="lp-pain-card"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -476,8 +476,8 @@ const Fichas = () => {
         </motion.p>
         <motion.div className="lp-pills"
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
-          {['Sem papel', 'Sem divergência', 'Histórico completo'].map((p, i) => (
-            <span key={i} className="lp-pill">{p}</span>
+          {['Sem papel', 'Sem divergência', 'Histórico completo'].map((p) => (
+            <span key={p} className="lp-pill">{p}</span>
           ))}
         </motion.div>
       </div>
@@ -519,7 +519,7 @@ const TerminalAnim = () => {
         <div className="lp-dot lp-dot-r" /><div className="lp-dot lp-dot-y" /><div className="lp-dot lp-dot-g" />
       </div>
       <div className="lp-term-body">
-        {LINES.slice(0, vis).map((l, i) => <div key={i} className={l.cls}>{l.text}</div>)}
+        {LINES.slice(0, vis).map((l) => <div key={l.text} className={l.cls}>{l.text}</div>)}
         {started && vis < LINES.length && <span className="lp-blink" />}
       </div>
     </motion.div>

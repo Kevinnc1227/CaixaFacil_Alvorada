@@ -41,6 +41,7 @@ export const listLeads = async (req: AuthRequest, res: Response): Promise<void> 
         const todosLeads = await db.select().from(leads).orderBy(leads.criadoEm);
         res.json(todosLeads);
     } catch (error) {
+        console.error('listLeads error:', error);
         res.status(500).json({ error: 'Erro ao listar leads' });
     }
 };
@@ -64,6 +65,7 @@ export const updateLeadStatus = async (req: AuthRequest, res: Response): Promise
 
         res.json(atualizado);
     } catch (error) {
+        console.error('updateLeadStatus error:', error);
         res.status(500).json({ error: 'Erro ao atualizar lead' });
     }
 };

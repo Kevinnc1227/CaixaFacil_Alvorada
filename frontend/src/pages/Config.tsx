@@ -85,33 +85,42 @@ export default function Config() {
                             </tr>
                         </thead>
                         <tbody>
-                            {isLoading ? (
-                                <tr><td colSpan={3} className="p-8 text-center"><div className="w-8 h-8 border-2 border-cf-accent border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
-                            ) : usuarios.length === 0 ? (
-                                <tr><td colSpan={3} className="p-8 text-center text-cf-muted/40">
-                                    <p className="font-mono text-xs uppercase tracking-wider">Nenhum usuário encontrado</p>
-                                </td></tr>
-                            ) : usuarios.map((user: any) => (
-                                <tr key={user.id}>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded bg-cf-surface-high border border-cf-border flex items-center justify-center text-cf-muted font-bold text-sm flex-shrink-0">
-                                                {(user.nome || '?').charAt(0).toUpperCase()}
+                            {(() => {
+                                // Extração do ternário aninhado para variável independente (regra SonarCloud)
+                                if (isLoading) {
+                                    return (
+                                        <tr><td colSpan={3} className="p-8 text-center"><div className="w-8 h-8 border-2 border-cf-accent border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
+                                    );
+                                }
+                                if (usuarios.length === 0) {
+                                    return (
+                                        <tr><td colSpan={3} className="p-8 text-center text-cf-muted/40">
+                                            <p className="font-mono text-xs uppercase tracking-wider">Nenhum usuário encontrado</p>
+                                        </td></tr>
+                                    );
+                                }
+                                return usuarios.map((user: any) => (
+                                    <tr key={user.id}>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 rounded bg-cf-surface-high border border-cf-border flex items-center justify-center text-cf-muted font-bold text-sm flex-shrink-0">
+                                                    {(user.nome || '?').charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-cf-text">{user.nome}</div>
+                                                    <div className="text-xs text-cf-muted font-mono">{user.email}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="font-medium text-cf-text">{user.nome}</div>
-                                                <div className="text-xs text-cf-muted font-mono">{user.email}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={`cf-badge ${user.perfil === 'ADMINISTRADOR' ? 'cf-badge-amber' : 'cf-badge-muted'}`}>{user.perfil}</span>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className={`cf-badge ${user.ativo ? 'cf-badge-green' : 'cf-badge-red'}`}>{user.ativo ? 'Ativo' : 'Inativo'}</span>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td>
+                                            <span className={`cf-badge ${user.perfil === 'ADMINISTRADOR' ? 'cf-badge-amber' : 'cf-badge-muted'}`}>{user.perfil}</span>
+                                        </td>
+                                        <td className="text-center">
+                                            <span className={`cf-badge ${user.ativo ? 'cf-badge-green' : 'cf-badge-red'}`}>{user.ativo ? 'Ativo' : 'Inativo'}</span>
+                                        </td>
+                                    </tr>
+                                ));
+                            })()}
                         </tbody>
                     </table>
                 </div>
