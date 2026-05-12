@@ -107,19 +107,21 @@ export default function Estoque() {
                                 </td></tr>
                             ) : stock.map((s: Produto) => {
                                 const criticallyLow = s.qtdEstoque > 0 && s.qtdEstoque <= s.qtdMinima;
+                                const isInactive = s.ativo === false;
+                                const qtdColor = s.qtdEstoque === 0 ? 'text-cf-red' : criticallyLow ? 'text-cf-yellow' : 'text-cf-text';
                                 return (
-                                    <tr key={s.id} className={!s.ativo ? 'opacity-40' : ''}>
+                                    <tr key={s.id} className={isInactive ? 'opacity-40' : ''}>
                                         <td>
                                             <div className="font-medium text-cf-text flex items-center gap-2">
                                                 {s.nome}
-                                                {!s.ativo && <span className="cf-badge cf-badge-muted">INATIVO</span>}
+                                                {isInactive && <span className="cf-badge cf-badge-muted">INATIVO</span>}
                                             </div>
                                             <div className="text-xs text-cf-muted font-mono mt-0.5">{s.categoria}</div>
                                         </td>
                                         <td><span className="cf-price">{s.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></td>
                                         <td className="text-center">
-                                            <span className={`font-bold text-lg font-mono ${s.qtdEstoque === 0 ? 'text-cf-red' : criticallyLow ? 'text-cf-yellow' : 'text-cf-text'}`}>{s.qtdEstoque}</span>
-                                            <span className="text-xs text-cf-muted ml-1">un.</span>
+                                            <span className={`font-bold text-lg font-mono ${qtdColor}`}>{s.qtdEstoque}</span>
+                                            {' '}<span className="text-xs text-cf-muted">un.</span>
                                             {criticallyLow && <div className="text-[10px] text-cf-yellow font-mono mt-0.5">⚠ Mín: {s.qtdMinima}</div>}
                                         </td>
                                         <td className="text-right">
@@ -214,7 +216,7 @@ export default function Estoque() {
                             <button onClick={() => setAjusteModal(null)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
                             <button onClick={() => ajustarMutation.mutate()} disabled={!ajusteQtd || Number.parseInt(ajusteQtd, 10) <= 0 || ajustarMutation.isPending}
                                 className={`cf-btn flex-1 ${ajusteTipo === 'SAIDA' ? 'cf-btn-danger' : 'cf-btn-primary'}`}>
-                                {ajustarMutation.isPending ? 'Salvando...' : ajusteTipo === 'ENTRADA' ? 'Confirmar Entrada' : 'Confirmar Saída'}
+                                {(() => { if (ajustarMutation.isPending) return 'Salvando...'; return ajusteTipo === 'ENTRADA' ? 'Confirmar Entrada' : 'Confirmar Saída'; })()}
                             </button>
                         </div>
                     </div>
