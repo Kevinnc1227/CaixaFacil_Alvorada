@@ -102,8 +102,8 @@ export default function Suporte() {
                                     <span className="text-xs text-cf-muted font-mono">#{selecionado} · {selectedTicket?.categoria}</span>
                                 </div>
                             </div>
-                            {selectedTicket?.status !== 'RESOLVIDO' && (
-                                <button onClick={() => fecharTicketMutation.mutate(selecionado!)} disabled={fecharTicketMutation.isPending}
+                            {selectedTicket?.status !== 'RESOLVIDO' && selecionado !== null && (
+                                <button onClick={() => fecharTicketMutation.mutate(selecionado)} disabled={fecharTicketMutation.isPending}
                                     className="cf-btn cf-btn-ghost text-xs py-2 px-3 min-h-0 h-8 text-cf-green hover:border-cf-green">
                                     <span className="material-symbols-outlined text-[16px]">check_circle</span>
                                     RESOLVER
@@ -161,18 +161,18 @@ export default function Suporte() {
                         </div>
                         <div className="p-5 flex flex-col gap-4">
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Assunto *</label>
-                                <input className="cf-input" placeholder="Ex: Produto X com estoque incorreto" value={ticketForm.titulo} onChange={e => setTicketForm(f => ({ ...f, titulo: e.target.value }))} autoFocus />
+                                <label htmlFor="ticket-titulo" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Assunto *</label>
+                                <input id="ticket-titulo" className="cf-input" placeholder="Ex: Produto X com estoque incorreto" value={ticketForm.titulo} onChange={e => setTicketForm(f => ({ ...f, titulo: e.target.value }))} autoFocus />
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Categoria</label>
-                                <select className="cf-input" value={ticketForm.categoria} onChange={e => setTicketForm(f => ({ ...f, categoria: e.target.value }))}>
+                                <label htmlFor="ticket-categoria" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Categoria</label>
+                                <select id="ticket-categoria" className="cf-input" value={ticketForm.categoria} onChange={e => setTicketForm(f => ({ ...f, categoria: e.target.value }))}>
                                     {CATEGORIAS_TICKET.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Descrição *</label>
-                                <textarea className="cf-input h-28 resize-none" placeholder="Descreva o problema com o máximo de detalhes..." value={ticketForm.descricao} onChange={e => setTicketForm(f => ({ ...f, descricao: e.target.value }))} />
+                                <label htmlFor="ticket-descricao" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Descrição *</label>
+                                <textarea id="ticket-descricao" className="cf-input h-28 resize-none" placeholder="Descreva o problema com o máximo de detalhes..." value={ticketForm.descricao} onChange={e => setTicketForm(f => ({ ...f, descricao: e.target.value }))} />
                             </div>
                         </div>
                         <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">

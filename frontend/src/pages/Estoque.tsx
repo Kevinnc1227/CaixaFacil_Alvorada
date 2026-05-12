@@ -29,7 +29,7 @@ export default function Estoque() {
 
     const saveMutation = useMutation({
         mutationFn: async () => {
-            const payload = { nome: form.nome, categoria: form.categoria, precoVenda: parseFloat(String(form.precoVenda)), qtdEstoque: parseInt(String(form.qtdEstoque)), qtdMinima: parseInt(String(form.qtdMinima)) };
+            const payload = { nome: form.nome, categoria: form.categoria, precoVenda: Number.parseFloat(String(form.precoVenda)), qtdEstoque: Number.parseInt(String(form.qtdEstoque), 10), qtdMinima: Number.parseInt(String(form.qtdMinima), 10) };
             return editTarget ? api.put(`/produtos/${editTarget.id}`, payload) : api.post('/produtos', payload);
         },
         onSuccess: () => { toast.success(editTarget ? 'Produto atualizado!' : 'Produto criado!'); queryClient.invalidateQueries({ queryKey: ['produtos'] }); setShowModal(false); setEditTarget(null); setForm(FORM_EMPTY); },
@@ -39,7 +39,7 @@ export default function Estoque() {
     const ajustarMutation = useMutation({
         mutationFn: async () => {
             if (!ajusteModal) return;
-            return api.post(`/produtos/${ajusteModal.id}/estoque`, { quantidade: parseInt(ajusteQtd), tipo: ajusteTipo, motivo: ajusteMotivo || (ajusteTipo === 'ENTRADA' ? 'Entrada de estoque' : 'Saída manual') });
+            return api.post(`/produtos/${ajusteModal.id}/estoque`, { quantidade: Number.parseInt(ajusteQtd, 10), tipo: ajusteTipo, motivo: ajusteMotivo || (ajusteTipo === 'ENTRADA' ? 'Entrada de estoque' : 'Saída manual') });
         },
         onSuccess: () => { toast.success('Estoque ajustado!'); queryClient.invalidateQueries({ queryKey: ['produtos'] }); setAjusteModal(null); setAjusteQtd(''); setAjusteMotivo(''); },
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao ajustar.')
@@ -147,29 +147,29 @@ export default function Estoque() {
                         </div>
                         <div className="p-5 flex flex-col gap-4">
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Nome *</label>
-                                <input className="cf-input" placeholder="Ex: Coca-Cola 350ml" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} />
+                                <label htmlFor="prod-nome" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Nome *</label>
+                                <input id="prod-nome" className="cf-input" placeholder="Ex: Coca-Cola 350ml" value={form.nome} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} />
                             </div>
                             <div className="flex gap-4">
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Categoria *</label>
-                                    <select className="cf-input" value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))}>
+                                    <label htmlFor="prod-categoria" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Categoria *</label>
+                                    <select id="prod-categoria" className="cf-input" value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))}>
                                         {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Preço (R$) *</label>
-                                    <input className="cf-input" type="number" step="0.01" min="0" placeholder="0,00" value={form.precoVenda} onChange={e => setForm(f => ({ ...f, precoVenda: e.target.value }))} />
+                                    <label htmlFor="prod-preco" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Preço (R$) *</label>
+                                    <input id="prod-preco" className="cf-input" type="number" step="0.01" min="0" placeholder="0,00" value={form.precoVenda} onChange={e => setForm(f => ({ ...f, precoVenda: e.target.value }))} />
                                 </div>
                             </div>
                             <div className="flex gap-4">
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Qtd. Inicial</label>
-                                    <input className="cf-input" type="number" min="0" placeholder="0" value={form.qtdEstoque} onChange={e => setForm(f => ({ ...f, qtdEstoque: e.target.value }))} />
+                                    <label htmlFor="prod-qtd-inicial" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Qtd. Inicial</label>
+                                    <input id="prod-qtd-inicial" className="cf-input" type="number" min="0" placeholder="0" value={form.qtdEstoque} onChange={e => setForm(f => ({ ...f, qtdEstoque: e.target.value }))} />
                                 </div>
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Qtd. Mínima</label>
-                                    <input className="cf-input" type="number" min="0" placeholder="5" value={form.qtdMinima} onChange={e => setForm(f => ({ ...f, qtdMinima: e.target.value }))} />
+                                    <label htmlFor="prod-qtd-minima" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Qtd. Mínima</label>
+                                    <input id="prod-qtd-minima" className="cf-input" type="number" min="0" placeholder="5" value={form.qtdMinima} onChange={e => setForm(f => ({ ...f, qtdMinima: e.target.value }))} />
                                 </div>
                             </div>
                         </div>
@@ -202,17 +202,17 @@ export default function Estoque() {
                                 <p className="text-3xl font-bold font-mono text-cf-text mt-1">{ajusteModal.qtdEstoque} <span className="text-cf-muted text-base font-normal">un.</span></p>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Quantidade *</label>
-                                <input className="cf-input text-center text-xl font-bold font-mono" type="number" min="1" placeholder="0" value={ajusteQtd} onChange={e => setAjusteQtd(e.target.value)} autoFocus />
+                                <label htmlFor="ajuste-qtd" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Quantidade *</label>
+                                <input id="ajuste-qtd" className="cf-input text-center text-xl font-bold font-mono" type="number" min="1" placeholder="0" value={ajusteQtd} onChange={e => setAjusteQtd(e.target.value)} autoFocus />
                             </div>
                             <div className="flex flex-col gap-1">
-                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Motivo</label>
-                                <input className="cf-input" placeholder={ajusteTipo === 'ENTRADA' ? 'Ex: Compra de fornecedor' : 'Ex: Produto vencido'} value={ajusteMotivo} onChange={e => setAjusteMotivo(e.target.value)} />
+                                <label htmlFor="ajuste-motivo" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Motivo</label>
+                                <input id="ajuste-motivo" className="cf-input" placeholder={ajusteTipo === 'ENTRADA' ? 'Ex: Compra de fornecedor' : 'Ex: Produto vencido'} value={ajusteMotivo} onChange={e => setAjusteMotivo(e.target.value)} />
                             </div>
                         </div>
                         <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">
                             <button onClick={() => setAjusteModal(null)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
-                            <button onClick={() => ajustarMutation.mutate()} disabled={!ajusteQtd || parseInt(ajusteQtd) <= 0 || ajustarMutation.isPending}
+                            <button onClick={() => ajustarMutation.mutate()} disabled={!ajusteQtd || Number.parseInt(ajusteQtd, 10) <= 0 || ajustarMutation.isPending}
                                 className={`cf-btn flex-1 ${ajusteTipo === 'SAIDA' ? 'cf-btn-danger' : 'cf-btn-primary'}`}>
                                 {ajustarMutation.isPending ? 'Salvando...' : ajusteTipo === 'ENTRADA' ? 'Confirmar Entrada' : 'Confirmar Saída'}
                             </button>

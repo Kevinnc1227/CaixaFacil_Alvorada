@@ -2,7 +2,7 @@ import { db } from './db';
 import { organizacoes, usuarios, produtos } from './schema';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 dotenv.config();
 

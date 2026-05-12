@@ -3,7 +3,7 @@ import { db } from '../db/db';
 import { organizacoes, usuarios } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
 // ─── ORGANIZAÇÕES ─────────────────────────────────────────────────────────────
@@ -14,6 +14,7 @@ export const listOrganizacoes = async (req: AuthRequest, res: Response): Promise
         const orgs = await db.select().from(organizacoes).orderBy(organizacoes.criadoEm);
         res.json(orgs);
     } catch (error) {
+        console.error('[adminController] listOrganizacoes:', error);
         res.status(500).json({ error: 'Erro ao listar organizações' });
     }
 };
@@ -60,6 +61,7 @@ export const updateOrganizacao = async (req: AuthRequest, res: Response): Promis
 
         res.json(atualizado);
     } catch (error) {
+        console.error('[adminController] updateOrganizacao:', error);
         res.status(500).json({ error: 'Erro ao atualizar organização' });
     }
 };
@@ -79,6 +81,7 @@ export const resetSetupToken = async (req: AuthRequest, res: Response): Promise<
             setupLink: `http://localhost:5173/setup/${novoToken}`,
         });
     } catch (error) {
+        console.error('[adminController] resetSetupToken:', error);
         res.status(500).json({ error: 'Erro ao resetar setup token' });
     }
 };
@@ -100,6 +103,7 @@ export const listUsuariosByOrg = async (req: AuthRequest, res: Response): Promis
         }).from(usuarios).where(eq(usuarios.organizacaoId, orgId));
         res.json(users);
     } catch (error) {
+        console.error('[adminController] listUsuariosByOrg:', error);
         res.status(500).json({ error: 'Erro ao listar usuários' });
     }
 };

@@ -16,11 +16,8 @@ export async function enviarEmailNovoLead(data: LeadEmailData): Promise<void> {
 
     // Se Nodemailer não estiver configurado, apenas loga
     if (!process.env.MAIL_USER || !process.env.MAIL_PASS) {
-        console.log('📧 [Email Stub] Novo lead registrado (e-mail não configurado):');
-        console.log(`   Para: ${MAIL_DEST}`);
-        console.log(`   Negócio: ${data.nomeNegocio}`);
-        console.log(`   Email: ${data.email}`);
-        console.log(`   Telefone: ${data.telefone ?? '—'}`);
+        // Stub: log mínimo sem expor dados pessoais (PII)
+        console.log(`📧 [Email Stub] Novo lead registrado → destino: ${MAIL_DEST} | negócio: ${data.nomeNegocio}`);
         return;
     }
 
@@ -49,7 +46,7 @@ export async function enviarEmailNovoLead(data: LeadEmailData): Promise<void> {
                 </div>
             `,
         });
-        console.log(`📧 E-mail enviado para ${MAIL_DEST}`);
+        console.log('📧 E-mail de novo lead enviado com sucesso.');
     } catch (err) {
         console.error('Erro ao enviar e-mail:', err);
     }
