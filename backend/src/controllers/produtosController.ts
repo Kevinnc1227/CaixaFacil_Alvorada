@@ -1,22 +1,27 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { db } from '../db/db';
 import { produtos, ajustesEstoque } from '../db/schema';
-import { eq, like, and } from 'drizzle-orm';
+import { eq, like, or } from 'drizzle-orm';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
-export const listProdutos = async (req: AuthRequest, res: Response): Promise<void> => {
+export const listProdutos = async (req: Request, res: Response): Promise<void> => {
     try {
         const { q, categoria } = req.query;
-        const orgId = req.user!.organizacaoId!;
 
-        // Busca apenas produtos da organização do usuário autenticado
-        const results = await db.select().from(produtos)
-            .where(eq(produtos.organizacaoId, orgId))
-            .all();
+        let query = db.select().from(produtos);
 
+        // Simple filters
+        if (q) {
+            query.where(like(produtos.nome, `%${String(q)}%`));
+        }
+
+        const results = await query.all();
+
+        // Em memória para simplificar os filtros combinados (MVP)
         let filtered = results;
-        if (q) filtered = filtered.filter(p => p.nome.toLowerCase().includes(String(q).toLowerCase()));
-        if (categoria && categoria !== 'Todos') filtered = filtered.filter(p => p.categoria === categoria);
+        if (categoria && categoria !== 'Todos') {
+            filtered = filtered.filter(p => p.categoria === categoria);
+        }
 
         res.json(filtered);
     } catch (error) {
@@ -24,14 +29,8 @@ export const listProdutos = async (req: AuthRequest, res: Response): Promise<voi
     }
 };
 
-export const createProduto = async (req: AuthRequest, res: Response): Promise<void> => {
+export const createProduto = async (req: Request, res: Response): Promise<void> => {
     try {
-        const orgId = req.user!.organizacaoId!;
-        const { nome, categoria, precoVenda, qtdEstoque, qtdMinima } = req.body;
-
-        const [result] = await db.insert(produtos).values({
-            nome, categoria, precoVenda, qtdEstoque, qtdMinima,
-            organizacaoId: orgId,
         const { nome, categoria, precoVenda, precoCusto, qtdEstoque, qtdMinima } = req.body;
 
         const result = await db.insert(produtos).values({
@@ -43,22 +42,16 @@ export const createProduto = async (req: AuthRequest, res: Response): Promise<vo
             qtdMinima,
         }).returning();
 
-        res.status(201).json(result);
+        res.status(201).json(result[0]);
     } catch (error) {
         console.error('Erro ao criar produto:', error);
         res.status(500).json({ error: 'Erro ao criar produto' });
     }
 };
 
-export const updateProduto = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateProduto = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = Number(req.params.id);
-        const orgId = req.user!.organizacaoId!;
-        const { nome, categoria, precoVenda, qtdMinima, ativo } = req.body;
-
-        const [result] = await db.update(produtos)
-            .set({ nome, categoria, precoVenda, qtdMinima, ativo })
-            .where(and(eq(produtos.id, id), eq(produtos.organizacaoId, orgId)))
         const { nome, categoria, precoVenda, precoCusto, qtdMinima, ativo } = req.body;
 
         const result = await db.update(produtos)
@@ -66,7 +59,7 @@ export const updateProduto = async (req: AuthRequest, res: Response): Promise<vo
             .where(eq(produtos.id, id))
             .returning();
 
-        res.json(result);
+        res.json(result[0]);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao atualizar produto' });
     }
@@ -88,19 +81,15 @@ export const deleteProduto = async (req: Request, res: Response): Promise<void> 
 export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const produtoId = Number(req.params.id);
-        const orgId = req.user!.organizacaoId!;
-        const usuarioId = req.user!.id;
         const { quantidade, tipo, motivo } = req.body;
+        const usuarioId = req.user!.id; // Authenticated user
 
         if (quantidade <= 0) {
             res.status(400).json({ error: 'A quantidade deve ser maior que zero' });
             return;
         }
 
-        // Garante que o produto pertence à organização
-        const produtoAtual = await db.select().from(produtos)
-            .where(and(eq(produtos.id, produtoId), eq(produtos.organizacaoId, orgId)))
-            .get();
+        const produtoAtual = await db.select().from(produtos).where(eq(produtos.id, produtoId)).get();
 
         if (!produtoAtual) {
             res.status(404).json({ error: 'Produto não encontrado' });
@@ -108,21 +97,17 @@ export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<v
         }
 
         let novaQtd = produtoAtual.qtdEstoque;
+
         if (tipo === 'ENTRADA') {
             novaQtd += quantidade;
         } else if (tipo === 'SAIDA') {
-            novaQtd = Math.max(0, novaQtd - quantidade);
+            novaQtd -= quantidade;
+            if (novaQtd < 0) novaQtd = 0;
         } else {
             res.status(400).json({ error: 'Tipo de ajuste inválido (ENTRADA ou SAIDA)' });
             return;
         }
 
-        await db.transaction(async (tx) => {
-            await tx.insert(ajustesEstoque).values({
-                produtoId, usuarioId, quantidade, tipo, motivo,
-                organizacaoId: orgId,
-            });
-            await tx.update(produtos).set({ qtdEstoque: novaQtd }).where(eq(produtos.id, produtoId));
         db.transaction((tx) => {
             // Registrar log de auditoria
             tx.insert(ajustesEstoque).values({

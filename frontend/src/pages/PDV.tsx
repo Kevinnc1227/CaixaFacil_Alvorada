@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import api from '../api/api';
+import { api } from '../api/api';
 
 type Produto = { id: number; nome: string; categoria: string; precoVenda: number; qtdEstoque: number; ativo: boolean; };
 type CartItem = { produto: Produto; qtd: number; };
@@ -15,6 +15,7 @@ export default function PDV() {
     const [search, setSearch] = useState('');
     const [cart, setCart] = useState<CartItem[]>([]);
 
+    // Modal lançar na ficha
     const [showFichaModal, setShowFichaModal] = useState(false);
     const [fichaId, setFichaId] = useState<number | null>(null);
 
@@ -108,25 +109,25 @@ export default function PDV() {
     });
 
     return (
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden gap-4 h-full relative z-10">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden gap-xs md:gap-md h-full">
             {/* Product Grid */}
-            <section className="flex-[2] md:flex-[2.5] lg:flex-[3] flex flex-col cf-card overflow-hidden h-full">
-                <div className="flex flex-col gap-3 p-4 border-b border-cf-border bg-cf-surface-high flex-shrink-0">
-                    <div className="relative">
-                        <span className="material-symbols-outlined text-cf-muted absolute left-3 top-1/2 -translate-y-1/2">search</span>
+            <section className="flex-[2] md:flex-[2.5] lg:flex-[3] flex flex-col bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm h-full">
+                <div className="flex flex-col gap-2 p-md border-b border-outline-variant bg-surface-variant flex-shrink-0">
+                    <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant">
+                        <span className="material-symbols-outlined text-on-surface-variant mr-2">search</span>
                         <input
-                            className="cf-input pl-10"
-                            placeholder="Buscar produto ou código..."
+                            className="bg-transparent border-none outline-none text-body-md text-on-surface w-full p-0"
+                            placeholder="Buscar produto..."
                             value={search} onChange={e => setSearch(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2 overflow-x-auto cf-scroll pb-1">
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar">
                         {CATEGORIAS.map(cat => (
                             <button
                                 key={cat} onClick={() => setFilter(cat)}
-                                className={`px-4 py-2 rounded-full font-sans text-xs font-bold whitespace-nowrap transition-all border ${filter === cat
-                                    ? 'bg-cf-accent text-cf-accent-text border-cf-accent shadow-[0_0_10px_rgba(212,168,83,0.3)]'
-                                    : 'bg-cf-surface border-cf-border text-cf-muted hover:text-cf-text hover:border-cf-border-strong'}`}
+                                className={`px-4 py-2 rounded-lg font-label-bold whitespace-nowrap transition-colors border ${filter === cat
+                                    ? 'bg-secondary-container text-white border-secondary-container shadow-inner'
+                                    : 'bg-surface-container-high border-outline-variant text-on-surface hover:bg-surface-bright'}`}
                             >
                                 {cat}
                             </button>
@@ -134,16 +135,13 @@ export default function PDV() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 content-start cf-scroll">
+                <div className="flex-1 overflow-y-auto p-md grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-md content-start">
                     {isLoading ? (
-                        <div className="col-span-full flex flex-col items-center justify-center py-12 gap-4">
-                            <div className="w-10 h-10 border-2 border-cf-accent border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-cf-muted font-mono uppercase tracking-widest text-xs">Carregando catálogo...</span>
-                        </div>
+                        <div className="col-span-full flex justify-center py-8 text-on-surface-variant">Carregando produtos...</div>
                     ) : filteredProducts.length === 0 ? (
-                        <div className="col-span-full flex flex-col items-center justify-center py-12 text-cf-muted/50">
+                        <div className="col-span-full flex flex-col items-center justify-center py-12 text-on-surface-variant/50">
                             <span className="material-symbols-outlined text-5xl mb-2">search_off</span>
-                            <p className="font-mono text-sm uppercase tracking-wider">0 Resultados</p>
+                            <p className="text-sm">Nenhum produto encontrado</p>
                         </div>
                     ) : filteredProducts.map((produto: Produto) => {
                         const isEsgotado = produto.qtdEstoque <= 0;
@@ -153,39 +151,34 @@ export default function PDV() {
                                 key={produto.id}
                                 onClick={() => addToCart(produto)}
                                 disabled={isEsgotado}
-                                className={`flex flex-col bg-cf-surface border rounded-xl overflow-hidden group text-left transition-all duration-150 relative ${isEsgotado
-                                    ? 'border-cf-border opacity-40 cursor-not-allowed grayscale'
+                                className={`flex flex-col bg-surface-container-lowest border rounded-lg overflow-hidden group text-left transition-all duration-150 relative ${isEsgotado
+                                    ? 'border-outline-variant opacity-50 cursor-not-allowed'
                                     : inCart
-                                        ? 'border-cf-accent bg-cf-accent-glow ring-1 ring-cf-accent'
-                                        : 'border-cf-border hover:border-cf-accent hover:shadow-cf-accent active:scale-[0.97]'}`}
+                                        ? 'border-secondary bg-secondary/5 ring-1 ring-secondary'
+                                        : 'border-outline-variant hover:border-secondary hover:bg-surface-container-low active:scale-[0.98]'}`}
                             >
                                 {isEsgotado && (
-                                    <div className="absolute top-2 right-2 cf-badge cf-badge-red z-20">
-                                        Esgotado
+                                    <div className="absolute top-2 right-2 bg-error-container text-on-error-container text-[10px] font-bold px-2 py-0.5 rounded-full z-20">
+                                        ESGOTADO
                                     </div>
                                 )}
                                 {inCart && !isEsgotado && (
-                                    <div className="absolute top-2 right-2 bg-cf-accent text-cf-accent-text text-xs font-bold w-6 h-6 rounded-full z-20 flex items-center justify-center shadow-[0_0_10px_rgba(212,168,83,0.5)]">
+                                    <div className="absolute top-2 right-2 bg-secondary text-white text-[10px] font-bold w-5 h-5 rounded-full z-20 flex items-center justify-center">
                                         {inCart.qtd}
                                     </div>
                                 )}
-
-                                {/* Image Placeholder Area */}
-                                <div className="h-24 w-full bg-cf-surface-high border-b border-cf-border relative flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-cf-muted text-4xl group-hover:text-cf-accent transition-colors">
+                                <div className="h-28 w-full bg-surface-variant relative flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-surface-variant to-surface-dim"></div>
+                                    <span className="material-symbols-outlined text-outline text-4xl relative z-10">
                                         {produto.categoria === 'Bebidas' ? 'water_drop' : produto.categoria === 'Doces' ? 'cake' : 'fastfood'}
                                     </span>
                                 </div>
-
-                                {/* Info Area */}
-                                <div className="p-3 flex flex-col gap-1 z-10 w-full relative bg-cf-surface">
-                                    <span className="font-sans text-sm font-semibold text-cf-text line-clamp-1" title={produto.nome}>{produto.nome}</span>
-                                    <span className="cf-price mt-1">
+                                <div className="p-sm flex flex-col gap-xs z-10 relative bg-surface-container-lowest">
+                                    <span className="font-label-bold text-on-surface line-clamp-1" title={produto.nome}>{produto.nome}</span>
+                                    <span className="font-headline-md text-secondary-fixed-dim mt-1">
                                         {produto.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                     </span>
-                                    <div className="flex items-center justify-between mt-1">
-                                        <span className="text-[10px] text-cf-muted-light">Estoque: {produto.qtdEstoque}</span>
-                                    </div>
+                                    <span className="text-[10px] text-on-surface-variant">{produto.qtdEstoque} em estoque</span>
                                 </div>
                             </button>
                         );
@@ -193,13 +186,6 @@ export default function PDV() {
                 </div>
             </section>
 
-            {/* Cart Header & Content */}
-            <aside className="flex-1 flex flex-col cf-card shadow-cf-lg min-w-[300px] max-w-[420px] overflow-hidden h-full">
-                <div className="flex items-center justify-between p-4 border-b border-cf-border bg-cf-surface-high flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-cf-accent">shopping_cart</span>
-                        <h2 className="font-sans font-bold text-cf-text text-lg tracking-tight">
-                            Comanda
             {/* Mobile View Cart Button */}
             {!isCartMobileOpen && (
                 <div className="md:hidden fixed bottom-4 left-4 right-4 z-30">
@@ -234,40 +220,40 @@ export default function PDV() {
                         <h2 className="font-headline-md text-on-surface">
                             Pedido Atual
                             {cart.length > 0 && (
-                                <span className="ml-3 bg-cf-accent text-cf-accent-text text-xs px-2 py-0.5 rounded-full">{cart.reduce((a, i) => a + i.qtd, 0)} itens</span>
+                                <span className="ml-2 bg-secondary text-white text-xs px-2 py-0.5 rounded-full">{cart.reduce((a, i) => a + i.qtd, 0)}</span>
                             )}
                         </h2>
                     </div>
                     {cart.length > 0 && (
-                        <button onClick={clearCart} className="text-cf-muted hover:text-cf-red transition-colors p-1" title="Limpar Tudo">
-                            <span className="material-symbols-outlined">delete</span>
+                        <button onClick={clearCart} className="text-on-surface-variant hover:text-error transition-colors p-2 rounded-md hover:bg-white/5" title="Limpar">
+                            <span className="material-symbols-outlined">delete_sweep</span>
                         </button>
                     )}
                 </div>
 
-                <div className="flex-1 overflow-y-auto cf-scroll">
+                <div className="flex-1 overflow-y-auto">
                     {cart.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-cf-muted opacity-40 p-8 text-center gap-4">
-                            <span className="material-symbols-outlined text-6xl">qr_code_scanner</span>
-                            <p className="font-mono text-sm uppercase tracking-widest max-w-[200px]">Aguardando Inserção de Produtos</p>
+                        <div className="h-full flex flex-col items-center justify-center text-on-surface-variant opacity-50 p-6 text-center">
+                            <span className="material-symbols-outlined text-5xl mb-2">production_quantity_limits</span>
+                            <p className="font-label-bold">Toque nos produtos para adicionar ao carrinho</p>
                         </div>
                     ) : cart.map(item => (
-                        <div key={item.produto.id} className="flex items-center p-4 border-b border-cf-border/50 hover:bg-cf-surface-high transition-colors">
-                            <div className="flex-1 pr-3">
-                                <div className="font-sans font-semibold text-cf-text text-sm line-clamp-1">{item.produto.nome}</div>
-                                <div className="text-xs text-cf-muted-light mt-0.5">{item.produto.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} un.</div>
+                        <div key={item.produto.id} className="flex items-center p-md border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors">
+                            <div className="flex-1 pr-2">
+                                <div className="font-label-bold text-on-surface line-clamp-1">{item.produto.nome}</div>
+                                <div className="text-sm text-on-surface-variant">{item.produto.precoVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center bg-cf-bg rounded border border-cf-border h-8 overflow-hidden">
-                                    <button onClick={() => updateQtd(item.produto.id, -1)} className="w-8 h-full flex items-center justify-center text-cf-muted hover:text-cf-text hover:bg-cf-surface-highest transition-colors">
-                                        <span className="material-symbols-outlined text-[16px]">remove</span>
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center bg-surface-dim rounded border border-outline-variant h-8">
+                                    <button onClick={() => updateQtd(item.produto.id, -1)} className="w-8 h-full flex items-center justify-center text-on-surface-variant hover:text-white">
+                                        <span className="material-symbols-outlined text-[18px]">remove</span>
                                     </button>
-                                    <span className="w-8 text-center font-mono text-sm text-cf-text">{item.qtd}</span>
-                                    <button onClick={() => updateQtd(item.produto.id, 1)} className="w-8 h-full flex items-center justify-center text-cf-muted hover:text-cf-text hover:bg-cf-surface-highest transition-colors">
-                                        <span className="material-symbols-outlined text-[16px]">add</span>
+                                    <span className="w-6 text-center font-label-bold text-on-surface">{item.qtd}</span>
+                                    <button onClick={() => updateQtd(item.produto.id, 1)} className="w-8 h-full flex items-center justify-center text-on-surface-variant hover:text-white">
+                                        <span className="material-symbols-outlined text-[18px]">add</span>
                                     </button>
                                 </div>
-                                <div className="cf-price text-right w-[80px]">
+                                <div className="font-headline-md text-on-surface text-right w-[86px]">
                                     {(item.produto.precoVenda * item.qtd).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </div>
                             </div>
@@ -276,29 +262,29 @@ export default function PDV() {
                 </div>
 
                 {/* Checkout Footer */}
-                <div className="bg-cf-surface border-t border-cf-border p-5 flex flex-col gap-4 flex-shrink-0 z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.6)]">
-                    <div className="flex justify-between items-end mb-2">
-                        <span className="text-sm font-mono uppercase tracking-widest text-cf-muted">Total a Pagar</span>
-                        <span className="cf-price-lg leading-none">
+                <div className="bg-surface-container-highest border-t border-outline-variant p-md flex flex-col gap-md flex-shrink-0 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+                    <div className="flex justify-between items-end">
+                        <span className="text-lg text-on-surface-variant font-lexend">Total</span>
+                        <span className="font-stat-lg text-secondary tracking-tight">
                             {subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         </span>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <button
                             onClick={() => { setShowFichaModal(true); setFichaId(null); }}
                             disabled={cart.length === 0 || checkoutMutation.isPending || fichaCheckoutMutation.isPending}
-                            className="cf-btn cf-btn-secondary flex-1"
+                            className="btn-secondary flex-1 gap-1 disabled:opacity-40 disabled:cursor-not-allowed text-sm"
                         >
-                            <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                            <span className="material-symbols-outlined text-[18px]">confirmation_number</span>
                             FICHA
                         </button>
                         <button
                             onClick={() => checkoutMutation.mutate()}
                             disabled={cart.length === 0 || checkoutMutation.isPending || fichaCheckoutMutation.isPending}
-                            className="cf-btn cf-btn-primary flex-[2]"
+                            className="btn-primary flex-[2] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <span className="material-symbols-outlined text-[20px]">payments</span>
-                            {checkoutMutation.isPending ? 'ENVIANDO...' : 'PAGAR AGORA'}
+                            <span className="material-symbols-outlined fill text-[22px]">payments</span>
+                            {checkoutMutation.isPending ? 'PROCESSANDO...' : 'PAGAR AGORA'}
                         </button>
                     </div>
                     </div>
@@ -306,73 +292,64 @@ export default function PDV() {
 
             {/* Modal Lançar na Ficha */}
             {showFichaModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="cf-card-elevated w-full max-w-md overflow-hidden relative">
-                        {/* Fake top border accent */}
-                        <div className="h-1 w-full bg-cf-accent absolute top-0 left-0" />
-
-                        <div className="flex items-center justify-between p-5 border-b border-cf-border">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-surface rounded-2xl border border-outline-variant shadow-2xl w-full max-w-md">
+                        <div className="flex items-center justify-between p-md border-b border-outline-variant">
                             <div>
-                                <h2 className="font-sans text-xl font-bold text-cf-text tracking-tight">Associar à Ficha</h2>
-                                <p className="text-xs text-cf-muted font-mono tracking-wider uppercase mt-1">Direcionar PENDÊNCIA</p>
+                                <h2 className="font-headline-sm text-on-surface">Lançar na Ficha</h2>
+                                <p className="text-xs text-on-surface-variant">Selecione o cliente</p>
                             </div>
-                            <button onClick={() => setShowFichaModal(false)} className="text-cf-muted hover:text-cf-red transition-colors p-2 rounded-lg">
+                            <button onClick={() => setShowFichaModal(false)} className="text-on-surface-variant hover:text-error p-2 rounded-lg transition-colors">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
 
-                        <div className="p-5">
-                            <div className="bg-cf-surface-high border border-cf-border rounded-lg p-4 mb-5 flex justify-between items-center">
-                                <span className="text-xs font-mono uppercase tracking-widest text-cf-muted">Valor Total</span>
-                                <span className="font-mono text-lg font-bold text-cf-accent">
+                        <div className="p-md">
+                            <div className="bg-surface-container-low rounded-lg p-3 mb-4 flex justify-between">
+                                <span className="text-sm text-on-surface-variant">Total a lançar</span>
+                                <span className="font-bold text-secondary">
                                     {subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </span>
                             </div>
 
                             {fichasAbertas.length === 0 ? (
-                                <div className="text-center py-10">
-                                    <span className="material-symbols-outlined text-4xl block mb-2 text-cf-border-strong">assignment</span>
-                                    <p className="text-sm text-cf-muted">Nenhuma ficha em aberto disponível.</p>
+                                <div className="text-center py-6 text-on-surface-variant">
+                                    <span className="material-symbols-outlined text-4xl block mb-2 opacity-30">assignment</span>
+                                    <p className="text-sm">Nenhuma ficha aberta. Cadastre um cliente na aba Fichas.</p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto cf-scroll pr-1">
+                                <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
                                     {fichasAbertas.map((f: Ficha) => (
                                         <button
                                             key={f.id}
                                             onClick={() => setFichaId(f.id)}
-                                            className={`flex items-center justify-between p-3 rounded-lg border transition-all text-left ${fichaId === f.id
-                                                ? 'bg-cf-accent-glow border-cf-accent'
-                                                : 'bg-cf-bg border-cf-border hover:border-cf-accent/50'}`}
+                                            className={`flex items-center justify-between p-3 rounded-xl border transition-all ${fichaId === f.id
+                                                ? 'bg-secondary/10 border-secondary'
+                                                : 'bg-surface-container border-outline-variant hover:border-secondary/50'}`}
                                         >
-                                            <div className="flex items-center gap-3 w-full">
-                                                <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center font-mono font-bold text-sm ${fichaId === f.id ? 'bg-cf-accent text-cf-accent-text' : 'bg-cf-surface-high text-cf-text border border-cf-border'}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-primary-container text-primary flex items-center justify-center text-xs font-bold">
                                                     {f.nome.charAt(0).toUpperCase()}
                                                 </div>
-                                                <div className="flex flex-col overflow-hidden">
-                                                    <span className="font-sans font-semibold text-sm text-cf-text truncate">{f.nome}</span>
-                                                    <span className="text-[10px] text-cf-muted-light font-mono truncate">ID: #{f.id.toString().padStart(4, '0')}</span>
-                                                </div>
-                                                <div className="ml-auto text-right">
-                                                    <div className="text-xs text-cf-text">Atual</div>
-                                                    <div className="text-xs font-mono text-cf-muted">
-                                                        {(f.totalAcumulado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                    </div>
-                                                </div>
+                                                <span className="font-label-bold text-on-surface">{f.nome}</span>
                                             </div>
+                                            <span className="text-sm text-on-surface-variant">
+                                                {(f.totalAcumulado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </span>
                                         </button>
                                     ))}
                                 </div>
                             )}
                         </div>
 
-                        <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">
-                            <button onClick={() => setShowFichaModal(false)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
+                        <div className="flex gap-md p-md border-t border-outline-variant">
+                            <button onClick={() => setShowFichaModal(false)} className="btn-secondary flex-1">Cancelar</button>
                             <button
                                 onClick={() => fichaCheckoutMutation.mutate()}
                                 disabled={!fichaId || fichaCheckoutMutation.isPending}
-                                className="cf-btn cf-btn-primary flex-1"
+                                className="btn-primary flex-1 disabled:opacity-50"
                             >
-                                {fichaCheckoutMutation.isPending ? 'Aguarde...' : 'Confirmar Ficha'}
+                                {fichaCheckoutMutation.isPending ? 'Lançando...' : 'Confirmar Lançamento'}
                             </button>
                         </div>
                     </div>
