@@ -17,16 +17,20 @@ export default function Estoque() {
     const [ajusteQtd, setAjusteQtd] = useState('');
     const [ajusteMotivo, setAjusteMotivo] = useState('');
 
+    // Puxo a lista de produtos. O React Query cuida de não ficar batendo na API toda hora sem necessidade.
     const { data: stock = [], isLoading } = useQuery({
         queryKey: ['produtos'],
         queryFn: async () => { const res = await api.get('/produtos'); return res.data; }
     });
 
+    // Dashboards em tempo real: calculo na mosca quantos itens estão em estado crítico ou zerados.
     const totalItens = stock.length;
     const criticos = stock.filter((s: Produto) => s.qtdEstoque <= s.qtdMinima && s.qtdEstoque > 0).length;
     const esgotados = stock.filter((s: Produto) => s.qtdEstoque <= 0).length;
     const categorias = new Set(stock.map((s: Produto) => s.categoria)).size;
 
+    // Mutação para criar ou editar um produto.
+    // Se eu tenho o 'editTarget', significa que tô atualizando. Se não, é produto novo!
     const saveMutation = useMutation({
         mutationFn: async () => {
             const payload = { nome: form.nome, categoria: form.categoria, precoVenda: Number.parseFloat(String(form.precoVenda)), qtdEstoque: Number.parseInt(String(form.qtdEstoque), 10), qtdMinima: Number.parseInt(String(form.qtdMinima), 10) };
@@ -36,6 +40,8 @@ export default function Estoque() {
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao salvar.')
     });
 
+    // Mutação vital: Ajuste de estoque manual (Entrada/Saída).
+    // O backend já vai gerar o log de movimentação pra isso automaticamente lá no servidor.
     const ajustarMutation = useMutation({
         mutationFn: async () => {
             if (!ajusteModal) return;
@@ -45,6 +51,7 @@ export default function Estoque() {
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao ajustar.')
     });
 
+    // Funções auxiliares pra gerenciar a abertura e fechamento de modais limpando os formulários.
     const openCreate = () => { setEditTarget(null); setForm(FORM_EMPTY); setShowModal(true); };
     const openEdit = (p: Produto) => { setEditTarget(p); setForm({ nome: p.nome, categoria: p.categoria, precoVenda: String(p.precoVenda), qtdEstoque: String(p.qtdEstoque), qtdMinima: String(p.qtdMinima) }); setShowModal(true); };
     const openAjuste = (p: Produto, tipo: 'ENTRADA' | 'SAIDA') => { setAjusteModal(p); setAjusteTipo(tipo); setAjusteQtd(''); setAjusteMotivo(''); };

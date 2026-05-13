@@ -11,13 +11,17 @@ const CATEGORIAS = ['Todos', 'Bebidas', 'Salgados', 'Doces', 'Combos'];
 
 export default function PDV() {
     const queryClient = useQueryClient();
+    
+    // Aqui eu guardo o estado da tela: qual categoria tá filtrada, o que o cara digitou na busca e os itens do carrinho (comanda).
     const [filter, setFilter] = useState('Todos');
     const [search, setSearch] = useState('');
     const [cart, setCart] = useState<CartItem[]>([]);
 
+    // Controle do modal de "Lançar na Ficha" e qual ficha foi selecionada.
     const [showFichaModal, setShowFichaModal] = useState(false);
     const [fichaId, setFichaId] = useState<number | null>(null);
 
+    // Uso o React Query pra buscar os produtos lá no backend. Ele já cuida do loading e cache pra mim.
     const { data: produtos = [], isLoading } = useQuery({
         queryKey: ['produtos'],
         queryFn: async () => {
@@ -26,6 +30,8 @@ export default function PDV() {
         }
     });
 
+    // Puxo as fichas abertas, mas só faço a requisição se o modal de ficha estiver aberto (enabled: showFichaModal).
+    // Isso economiza requisição desnecessária na rede!
     const { data: fichasAbertas = [] } = useQuery<Ficha[]>({
         queryKey: ['fichas'],
         queryFn: async () => {
@@ -35,12 +41,16 @@ export default function PDV() {
         enabled: showFichaModal
     });
 
+    // Filtro os produtos na hora de renderizar baseado na categoria e no texto da busca. 
+    // Ah, e só mostro os ativos, claro.
     const filteredProducts = produtos.filter((p: Produto) => {
         const matchCategory = filter === 'Todos' || p.categoria === filter;
         const matchSearch = p.nome.toLowerCase().includes(search.toLowerCase());
         return matchCategory && matchSearch && p.ativo;
     });
 
+    // Função pra jogar o produto pro carrinho.
+    // Se não tem estoque, já corto logo. Se já tá no carrinho, eu só somo 1 na quantidade.
     const addToCart = (product: Produto) => {
         if (product.qtdEstoque <= 0) return;
         setCart(prev => {
@@ -54,6 +64,9 @@ export default function PDV() {
         });
     };
 
+    // Altera a quantidade de um item no carrinho.
+    // O Math.max(0, ...) garante que não vou ter quantidade negativa.
+    // O .filter() no final arranca o item se a quantidade chegar a zero.
     const updateQtd = (id: number, delta: number) => {
         setCart(prev => prev.map(item => {
             if (item.produto.id === id) {
@@ -65,8 +78,11 @@ export default function PDV() {
     };
 
     const clearCart = () => setCart([]);
+    
+    // Matemática básica: somo o preço vezes a quantidade de tudo que tá no carrinho pra dar o total da venda.
     const subtotal = cart.reduce((acc, item) => acc + (item.produto.precoVenda * item.qtd), 0);
 
+    // Monto o "pacote" de dados que o backend espera pra registrar a venda.
     const buildPayload = (tipo: string, fichaIdParam?: number) => ({
         tipo,
         fichaId: fichaIdParam || null,
@@ -78,6 +94,8 @@ export default function PDV() {
         }))
     });
 
+    // Mutação para venda direta (PAGAR_AGORA). O cliente paga e leva.
+    // Invalido a query 'produtos' logo depois pra forçar o app a pegar o estoque atualizado do backend.
     const checkoutMutation = useMutation({
         mutationFn: async () => api.post('/pedidos', buildPayload('PAGAR_AGORA')),
         onSuccess: () => {
@@ -88,6 +106,8 @@ export default function PDV() {
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao fechar pedido')
     });
 
+    // Mutação para lançar na Ficha do cliente (LANCAR_FICHA). Ele pega agora e a gente cobra depois.
+    // Aqui eu também recarrego as fichas depois, além dos produtos, pra atualizar os valores na hora lá no modal.
     const fichaCheckoutMutation = useMutation({
         mutationFn: async () => {
             if (!fichaId) { toast.error('Selecione uma ficha!'); return; }
