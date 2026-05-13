@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'khub-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-alvorada-key-1975';
 
 export interface AuthRequest extends Request {
     user?: {
         id: number;
         perfil: string;
-        organizacaoId: number | null;
     };
 }
 
@@ -22,11 +21,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const token = authHeader.split(' ')[1];
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as {
-            id: number;
-            perfil: string;
-            organizacaoId: number | null;
-        };
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: number; perfil: string };
         req.user = decoded;
         next();
     } catch (error) {
@@ -34,7 +29,6 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     }
 };
 
-// Restringe a qualquer conjunto de perfis
 export const requireRole = (roles: string[]) => {
     return (req: AuthRequest, res: Response, next: NextFunction): void => {
         if (!req.user || !roles.includes(req.user.perfil)) {
@@ -44,6 +38,3 @@ export const requireRole = (roles: string[]) => {
         next();
     };
 };
-
-// Atalho para SUPERADMIN exclusivo
-export const requireSuperAdmin = requireRole(['SUPERADMIN']);

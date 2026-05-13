@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alvorada OS - PDV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#001135",
+                        "surface-variant": "#243458",
+                        "on-secondary-fixed": "#410004",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#000c2b",
+                        "primary-container": "#0d1b3e",
+                        "surface-container-high": "#19294d",
+                        "surface": "#001135",
+                        "on-error": "#690005",
+                        "on-secondary": "#68000c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary": "#b9c5f2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "tertiary": "#c6c6c7",
+                        "surface-container-highest": "#243458",
+                        "on-primary": "#222f53",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#b9c5f2",
+                        "on-primary-container": "#7784ad",
+                        "inverse-surface": "#d9e2ff",
+                        "inverse-on-surface": "#202f54",
+                        "surface-container-low": "#081a3d",
+                        "outline-variant": "#45464e",
+                        "on-secondary-fixed-variant": "#930015",
+                        "secondary": "#ffb3ae",
+                        "on-surface-variant": "#c6c6cf",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-tertiary": "#2f3131",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed": "#ffdad7",
+                        "surface-bright": "#29385d",
+                        "error": "#ffb4ab",
+                        "surface-container": "#0d1e42",
+                        "surface-tint": "#b9c5f2",
+                        "on-tertiary-container": "#848585",
+                        "inverse-primary": "#515d84",
+                        "outline": "#8f9099",
+                        "tertiary-container": "#1b1d1d",
+                        "on-primary-fixed-variant": "#39456b",
+                        "on-secondary-container": "#ffa39d",
+                        "on-error-container": "#ffdad6",
+                        "background": "#001135",
+                        "secondary-container": "#9b0217",
+                        "on-primary-fixed": "#0b1a3d",
+                        "on-background": "#d9e2ff",
+                        "on-surface": "#d9e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Lexend"],
+                        "display-lg": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "stat-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-bold": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "stat-lg": ["40px", { "lineHeight": "1.0", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Scrollbar styling for high-contrast dark UI */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #45464e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8f9099; }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden selection:bg-secondary-container selection:text-white">
+<!-- SideNavBar (JSON Controlled) -->
+<nav class="hidden md:flex flex-col bg-slate-950 h-screen w-64 border-r border-white/10 pt-4 pb-6 z-20 flex-shrink-0">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+<img alt="Club Logo" class="w-full h-full object-cover" data-alt="Minimalist abstract metallic crest logo glowing subtly under dark stadium lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ60kJDW43tK7-r3yy5tUplaQsbwifH38F1cfdHr2SOjF9sARQHJt1lB6MV_jrRCQnJQXkUihJOEYyB4D1KIj1WPlfmA9HDPkyYeHm1PkAXkhVB5MAQ6ooJFpV71HeUiVNWC0MkSkf6v1LvQF9VBM2UdVCmOodE6Ziorw4g3XqP1Y0-l14Op_KCq0hUbu1mcShs_lgXXq8w-fONSf83QTsKIf9A5DCYMvF9XRYIE47klZ-aVs1z9tgP_jYhtFif3-P7_ZYZu7ecx6J"/>
+</div>
+<div>
+<h1 class="text-xl font-bold text-red-600 tracking-tighter">Alvorada OS</h1>
+<p class="text-xs text-slate-400 font-['Lexend']">Stadium Operations</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 hover:bg-white/5 transition-all duration-200 font-['Lexend'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 bg-red-600 text-white rounded-lg px-4 py-3 mx-2 my-1 scale-95 transition-transform font-['Lexend'] text-sm font-medium shadow-lg shadow-red-900/20" href="#">
+<span class="material-symbols-outlined fill" data-icon="point_of_sale" data-weight="fill">point_of_sale</span>
+                PDV
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 hover:bg-white/5 transition-all duration-200 font-['Lexend'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                Estoque
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 hover:bg-white/5 transition-all duration-200 font-['Lexend'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+                Fichas
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 hover:bg-white/5 transition-all duration-200 font-['Lexend'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+                Fechamento
+            </a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white rounded-lg px-4 py-3 mx-2 my-1 hover:bg-white/5 transition-all duration-200 font-['Lexend'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+                Suporte
+            </a>
+</div>
+<div class="px-4 mt-auto">
+<button class="w-full bg-slate-800 text-white hover:bg-slate-700 transition-colors py-3 rounded-lg font-['Lexend'] text-sm font-bold flex justify-center items-center gap-2 border border-white/10">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                Novo Pedido
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-surface-dim relative">
+<!-- TopAppBar (JSON Controlled) -->
+<header class="flex justify-between items-center h-16 px-6 w-full bg-slate-950/95 backdrop-blur-md border-b border-white/10 docked full-width top-0 z-50 flex-shrink-0">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-slate-400 hover:text-white">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="text-2xl font-black text-red-600 dark:text-red-500 tracking-tighter md:hidden">
+                    ALVORADA
+                </div>
+<div class="hidden md:flex items-center bg-surface-variant rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-[20px]" data-icon="search">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant w-64 focus:ring-0 p-0" placeholder="Buscar produto..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-400 hover:text-white transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full"></span>
+</button>
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full border border-white/10 overflow-hidden ml-2 cursor-pointer hover:border-white/30 transition-colors">
+<img alt="Staff Profile" class="w-full h-full object-cover" data-alt="Profile photo of stadium staff member in dark uniform with slight smile under practical lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeDtCfmfk1HqOOBqP5TErFif3Cd2BsgtCenEWedy3HMlK1DCnyu8R16jA9vSSB2EX1zsamcjBUrmYoElTHYWZh2JEt_bWJR3dVP1epGAgeKoYf3Sz9cRbtQN9wIZb8JNOQjA4CbnbMvJneEA8suKAINJR2QUNger5lq_bhlVojZ13oELOS5uBC-suD6pQ_qL36FVSQ4MF73S7rvhIRi2luM5Rh_yM-GVcG2i-_oCSpZIJJZc1XJmZO0MbHhbjVpnT-CQRRBro-RRUx"/>
+</div>
+</div>
+</header>
+<!-- Canvas Workspace (Products & Cart) -->
+<div class="flex-1 flex flex-col md:flex-row overflow-hidden p-xs md:p-md gap-xs md:gap-md">
+<!-- Product Grid (Left Canvas) -->
+<section class="flex-[2] md:flex-[2.5] lg:flex-[3] flex flex-col bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm relative">
+<!-- Filters/Categories -->
+<div class="flex items-center gap-2 p-md border-b border-outline-variant bg-surface-variant overflow-x-auto no-scrollbar flex-shrink-0">
+<button class="px-4 py-2 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-bright transition-colors">Todos</button>
+<button class="px-4 py-2 rounded-lg bg-secondary-container text-on-secondary-container border border-secondary-container font-label-bold text-label-bold whitespace-nowrap shadow-inner">Bebidas</button>
+<button class="px-4 py-2 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-bright transition-colors">Salgados</button>
+<button class="px-4 py-2 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-bright transition-colors">Doces</button>
+<button class="px-4 py-2 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-bright transition-colors">Combos</button>
+</div>
+<!-- Grid -->
+<div class="flex-1 overflow-y-auto p-md grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-md content-start">
+<!-- Product Card 1 -->
+<button class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-secondary-fixed-dim hover:bg-surface-container-low transition-all duration-150 text-left active:scale-[0.98]">
+<div class="h-28 w-full bg-surface-variant relative">
+<img alt="Cerveja" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Cold can of premium beer covered in condensation droplets on a dark textured surface with dramatic rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGHkvwXbNLywOpJED6M31_sp8cwttUZvt2R1eU1Uwblq54cxObM77IcAk_OFeaaF1Cuo3lwmBIZQpwTvky16HlY52IKMFY3Ve66wNC8sxL9NEjrx9FtkxcX6ogRQft87W7WUpkzMjlDcllt7gG9PWblmAaZOJx35XGSG5esMktHpCCf9ZCkWun1pob7t-mfM9X6VgebACRJUjQA-7jri7toFWs1Q9sMwr0NQEYeGT9q0m_STZuI0J5L5TUgilbcyod9eD7xTs1KwC5"/>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Cerveja Pilsen</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">350ml</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed-dim mt-1">R$ 12,00</span>
+</div>
+</button>
+<!-- Product Card 2 -->
+<button class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-secondary-fixed-dim hover:bg-surface-container-low transition-all duration-150 text-left active:scale-[0.98]">
+<div class="h-28 w-full bg-surface-variant relative">
+<img alt="Coxinha" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Freshly fried golden coxinha pastry on a dark slate board with subtle rustic background lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ffTO6RmYBTBx1vgWGowbyjvH3YCGUt6rIBSHVjLLJsZg4nWBc5myN6SzjCCr9DO33IAfHc0QUwynTFniyvHgjKH9u7EgjGe3oMZo24vih3R_FVFmByjAv4Z4OH6Dh5Is3Q3GSYNlf1tRb7p0R3Ekrb0e0a84BjnyZ_DxsmSKS_x_u2qmfUtuSKcZkUmVszfWuILxElw401KWnJEW120b5AP7BqsJZWTEtKnwRxlJs2x387VG45c8yAV5qxheEZu7109giRdeWZ0x"/>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Coxinha de Frango</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">Unidade</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed-dim mt-1">R$ 8,50</span>
+</div>
+</button>
+<!-- Product Card 3 -->
+<button class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-secondary-fixed-dim hover:bg-surface-container-low transition-all duration-150 text-left active:scale-[0.98]">
+<div class="h-28 w-full bg-surface-variant relative flex items-center justify-center">
+<!-- Placeholder image using tailwind gradient for speed styling if image fails -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface-variant to-surface-dim"></div>
+<span class="material-symbols-outlined text-outline text-4xl relative z-10" data-icon="water_drop">water_drop</span>
+</div>
+<div class="p-sm flex flex-col gap-xs z-10 relative bg-surface-container-lowest">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Água Mineral</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">Sem Gás 500ml</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed-dim mt-1">R$ 5,00</span>
+</div>
+</button>
+<!-- Product Card 4 -->
+<button class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-secondary-fixed-dim hover:bg-surface-container-low transition-all duration-150 text-left active:scale-[0.98]">
+<div class="h-28 w-full bg-surface-variant relative">
+<img alt="Refrigerante" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="Glass of dark cola soda with ice cubes and condensation against a dark moody background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr_Zjn92MRFD-HfyIV6efy6deVHFojBkEvzYING1EWCYbI56wXPwGZ4sGkoer7LBeHUeNXRU5TztHw8RscURgBsHe-vkNHLParQMMJO-Ysv4S-p5LUAtLB_FH3fu7VXenWqpbzAhSfrgWehqa7AGTniXbbid04-Gc8oe4nNy-xgHTjRqBk2J5QjiKXzCLcJwMXYCpCt5iSeeBRc9Zz09yNMNlUnw7U3k1wbplVDKdZOck5wegT1Zo71cW3WRprbBWnz9z9w-PmZ8_S"/>
+</div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Refrigerante Cola</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">Lata 350ml</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed-dim mt-1">R$ 8,00</span>
+</div>
+</button>
+<!-- Product Card 5 -->
+<button class="flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:border-secondary-fixed-dim hover:bg-surface-container-low transition-all duration-150 text-left active:scale-[0.98]">
+<div class="h-28 w-full bg-surface-variant relative flex items-center justify-center">
+<div class="absolute inset-0 bg-gradient-to-br from-surface-variant to-surface-dim"></div>
+<span class="material-symbols-outlined text-outline text-4xl relative z-10" data-icon="fastfood">fastfood</span>
+</div>
+<div class="p-sm flex flex-col gap-xs z-10 relative bg-surface-container-lowest">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Combo Torcedor</span>
+<span class="font-body-md text-body-md text-on-surface-variant text-sm">2 Cerv + 1 Cox</span>
+<span class="font-headline-md text-headline-md text-secondary-fixed-dim mt-1">R$ 30,00</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Cart Section (Right Canvas) -->
+<aside class="flex-1 flex flex-col bg-surface-container rounded-xl border border-outline-variant shadow-lg min-w-[320px] max-w-[420px] overflow-hidden">
+<!-- Cart Header -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant bg-surface-container-high flex-shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface" data-icon="shopping_cart">shopping_cart</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Pedido #4092</h2>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors p-2 rounded-md hover:bg-white/5">
+<span class="material-symbols-outlined" data-icon="delete_sweep">delete_sweep</span>
+</button>
+</div>
+<!-- Cart Items List -->
+<div class="flex-1 overflow-y-auto">
+<!-- Item Row 1 -->
+<div class="flex items-center p-md border-b border-outline-variant/50 min-h-[72px] hover:bg-surface-container-high transition-colors group">
+<div class="flex-1">
+<div class="font-label-bold text-label-bold text-on-surface">Cerveja Pilsen</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-sm">R$ 12,00 un</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-dim rounded border border-outline-variant">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5"><span class="material-symbols-outlined text-[18px]" data-icon="remove">remove</span></button>
+<span class="w-8 text-center font-label-bold text-label-bold text-on-surface">2</span>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5"><span class="material-symbols-outlined text-[18px]" data-icon="add">add</span></button>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface text-right w-[80px]">R$ 24,00</div>
+</div>
+</div>
+<!-- Item Row 2 -->
+<div class="flex items-center p-md border-b border-outline-variant/50 min-h-[72px] hover:bg-surface-container-high transition-colors group">
+<div class="flex-1">
+<div class="font-label-bold text-label-bold text-on-surface">Coxinha de Frango</div>
+<div class="font-body-md text-body-md text-on-surface-variant text-sm">R$ 8,50 un</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-dim rounded border border-outline-variant">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5"><span class="material-symbols-outlined text-[18px]" data-icon="remove">remove</span></button>
+<span class="w-8 text-center font-label-bold text-label-bold text-on-surface">1</span>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5"><span class="material-symbols-outlined text-[18px]" data-icon="add">add</span></button>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface text-right w-[80px]">R$ 8,50</div>
+</div>
+</div>
+</div>
+<!-- Total & Action Bar -->
+<div class="bg-surface-container-highest border-t border-outline-variant p-md flex flex-col gap-md flex-shrink-0 relative z-10 shadow-[0_-4px_24px_rgba(0,0,0,0.5)]">
+<div class="flex justify-between items-end">
+<span class="font-body-lg text-body-lg text-on-surface-variant">Total a pagar</span>
+<span class="font-stat-lg text-stat-lg text-secondary-fixed-dim tracking-tight">R$ 32,50</span>
+</div>
+<button class="w-full h-16 bg-secondary-container hover:bg-error-container text-white rounded-lg flex items-center justify-center gap-2 font-headline-md text-headline-md transition-all active:scale-[0.98] border border-red-500/30 shadow-lg shadow-red-900/20">
+<span class="material-symbols-outlined fill text-[28px]" data-icon="payments" data-weight="fill">payments</span>
+                        Fechar Pedido
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

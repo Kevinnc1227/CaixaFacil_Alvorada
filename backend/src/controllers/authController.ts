@@ -1,33 +1,22 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { eq, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import { usuarios } from '../db/schema';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'khub-dev-secret-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-alvorada-key-1975';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Aceita email OU username no campo "identificador"
-        const { identificador, senha } = req.body;
+        const { email, senha } = req.body;
 
-        if (!identificador || !senha) {
-            res.status(400).json({ error: 'Identificador e senha são obrigatórios' });
+        if (!email || !senha) {
+            res.status(400).json({ error: 'Email e senha são obrigatórios' });
             return;
         }
 
-        // Busca por email OU por username
-        const userRecord = await db
-            .select()
-            .from(usuarios)
-            .where(
-                or(
-                    eq(usuarios.email, identificador),
-                    eq(usuarios.username, identificador)
-                )
-            )
-            .get();
+        const userRecord = await db.select().from(usuarios).where(eq(usuarios.email, email)).get();
 
         if (!userRecord) {
             res.status(401).json({ error: 'Credenciais inválidas' });
@@ -35,22 +24,19 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         if (!userRecord.ativo) {
-            res.status(403).json({ error: 'Usuário desativado. Entre em contato com o suporte.' });
+            res.status(403).json({ error: 'Usuário desativado' });
             return;
         }
 
         const isPasswordValid = await bcrypt.compare(senha, userRecord.senhaHash);
+
         if (!isPasswordValid) {
             res.status(401).json({ error: 'Credenciais inválidas' });
             return;
         }
 
         const token = jwt.sign(
-            {
-                id: userRecord.id,
-                perfil: userRecord.perfil,
-                organizacaoId: userRecord.organizacaoId ?? null,
-            },
+            { id: userRecord.id, perfil: userRecord.perfil },
             JWT_SECRET,
             { expiresIn: '8h' }
         );
@@ -61,10 +47,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                 id: userRecord.id,
                 nome: userRecord.nome,
                 email: userRecord.email,
-                username: userRecord.username,
-                perfil: userRecord.perfil,
-                organizacaoId: userRecord.organizacaoId,
-            },
+                perfil: userRecord.perfil
+            }
         });
     } catch (error) {
         console.error('Login error:', error);

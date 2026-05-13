@@ -5,9 +5,6 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-package-lock.json
-pnpm-lock.yaml
 
 # ====================
 # Build outputs
@@ -17,30 +14,22 @@ build/
 out/
 target/
 bin/
-.output/
 
 # ====================
-# Variáveis de ambiente — NUNCA subir ao git
+# Environment files
 # ====================
 .env
 .env.local
-.env.*.local
-.env.development
-.env.production
-.env.staging
-*.secret
-secrets.json
-secrets.yaml
-secrets.toml
+.env.development.local
+.env.test.local
+.env.production.local
 
 # ====================
-# Banco de dados local
+# Database
 # ====================
 backend/database.sqlite
 backend/*.sqlite
 backend/*.db
-*.sqlite
-*.db
 
 # ====================
 # Logs
@@ -48,17 +37,13 @@ backend/*.db
 logs/
 *.log
 *.ctxt
-*.log.*
 
 # ====================
-# OS
+# OS files
 # ====================
 .DS_Store
-.DS_Store?
 Thumbs.db
 desktop.ini
-ehthumbs.db
-$RECYCLE.BIN/
 
 # ====================
 # IDE / Editor
@@ -70,94 +55,19 @@ $RECYCLE.BIN/
 .project
 *.suo
 *.swp
-*.swo
-*.nvim
-.history/
 
 # ====================
-# TypeScript / Build artifacts
+# Java (legado)
+# ====================
+*.class
+
+# ====================
+# TypeScript
 # ====================
 *.tsbuildinfo
-*.js.map
 
 # ====================
-# Cache
+# Misc
 # ====================
 .cache/
-.parcel-cache/
-.turbo/
-.vite/
 coverage/
-.nyc_output/
-*.lcov
-
-# ====================
-# IA / Agentes / Skills — dados pessoais e de uso interno
-# ====================
-.agent/
-.agents/
-.gemini/
-.cursor/
-.copilot/
-.aider/
-*.agent
-skills-lock.json
-memoria.md
-DESIGN.md
-PRODUCT.md
-brain/
-knowledge/
-
-# ====================
-# Arquivos pessoais e de testes manuais
-# ====================
-backend/test_*.ts
-backend/checkDb.ts
-landing-page.html
-fix-styles.cjs
-caixafacil/
-scratch/
-
-# ====================
-# Documentos e arquivos de mídia pessoais
-# ====================
-*.pdf
-*.docx
-*.doc
-*.xls
-*.xlsx
-*.pptx
-*.ppt
-*.odt
-*.ods
-*.key
-*.pages
-*.numbers
-
-# ====================
-# Imagens geradas / assets brutos (manter apenas o que está em /public)
-# ====================
-*.psd
-*.ai
-*.sketch
-*.fig
-*.xd
-*.raw
-*.bmp
-
-# ====================
-# Arquivos de CI/CD locais e configs privadas
-# ====================
-.vercel/
-.netlify/
-.railway/
-.heroku/
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-*.cer
-id_rsa
-id_ed25519
-*.ppk

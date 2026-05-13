@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alvorada OS - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#001135",
+                        "surface-variant": "#243458",
+                        "on-secondary-fixed": "#410004",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#000c2b",
+                        "primary-container": "#0d1b3e",
+                        "surface-container-high": "#19294d",
+                        "surface": "#001135",
+                        "on-error": "#690005",
+                        "on-secondary": "#68000c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary": "#b9c5f2",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "tertiary": "#c6c6c7",
+                        "surface-container-highest": "#243458",
+                        "on-primary": "#222f53",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#b9c5f2",
+                        "on-primary-container": "#7784ad",
+                        "inverse-surface": "#d9e2ff",
+                        "inverse-on-surface": "#202f54",
+                        "surface-container-low": "#081a3d",
+                        "outline-variant": "#45464e",
+                        "on-secondary-fixed-variant": "#930015",
+                        "secondary": "#ffb3ae",
+                        "on-surface-variant": "#c6c6cf",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-tertiary": "#2f3131",
+                        "primary-fixed": "#dbe1ff",
+                        "secondary-fixed": "#ffdad7",
+                        "surface-bright": "#29385d",
+                        "error": "#ffb4ab",
+                        "surface-container": "#0d1e42",
+                        "surface-tint": "#b9c5f2",
+                        "on-tertiary-container": "#848585",
+                        "inverse-primary": "#515d84",
+                        "outline": "#8f9099",
+                        "tertiary-container": "#1b1d1d",
+                        "on-primary-fixed-variant": "#39456b",
+                        "on-secondary-container": "#ffa39d",
+                        "on-error-container": "#ffdad6",
+                        "background": "#001135",
+                        "secondary-container": "#9b0217",
+                        "on-primary-fixed": "#0b1a3d",
+                        "on-background": "#d9e2ff",
+                        "on-surface": "#d9e2ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Lexend"],
+                        "display-lg": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "stat-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "fontWeight": "800"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "stat-lg": ["40px", {"lineHeight": "1.0", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body-md min-h-screen flex selection:bg-secondary-container selection:text-white relative overflow-x-hidden">
+<!-- Background Watermark -->
+<div class="fixed inset-0 z-[-1] opacity-5 pointer-events-none flex items-center justify-center">
+<img alt="Club Watermark" class="w-[120%] h-[120%] object-cover object-center" data-alt="Faint, oversized crest or logo of a football club in monochrome navy, acting as a subtle textured background watermark." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKmS1IHxyShtC20eneG0AqDto6tW1nqzQPT_B5r6PV1Dw8DRnasIOQgufihtkEyI-Znai81m2ht_fE6Ey0wiaEKvXR2y7j3O2X7T_SAr69KDTLRjYg6oWJ1rnS_WvftJvJGnqLENWjNoDH8GMpvygxE6wLODVnZcBgq0qaKpDG3gbO_q3J2uwENTmB8-BhH_vKHUq551wF2PHFiFpzem-zseVhRD2cSFuYgvPUsLfIxVKOUKrPT4vO3BxwJHlKuuBKCmoz1lyGUd5Z"/>
+</div>
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col bg-slate-950 h-screen w-64 border-r border-white/10 pt-4 pb-6 z-20">
+<div class="px-6 mb-8 flex flex-col gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-surface-variant flex-shrink-0">
+<img alt="Club Logo" class="w-full h-full object-cover" data-alt="Club Logo: A bold, high-contrast sports team crest." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4u0BmLjbRcVx2Cw__LLm-5x9LpWfNo-ol8dc66QRhODEhGIcFUJBsGgiPazyaOlegfb5y5OZL5aAks3hpCPOm5j6EtnxcN_fN1My55Ia8n3dk1zZ1WH-EduXILGqvsVhVFfZU6qovrDwONztpUeqQN9TNrVy9HKiemj4yCjqLFGxNyQXYne971tjczLPfxM9jQqJ-mLywKdC7O5mnNps8hU8akHXVoR8kVMcIgWEPmchE5s3WiXRiHwFoDv4sGHiuqqNFa2nTTVBT"/>
+</div>
+<div>
+<h1 class="font-label-bold text-label-bold text-red-600 tracking-wider">Alvorada OS</h1>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80">Stadium Operations</p>
+</div>
+</div>
+<div class="flex flex-col gap-1 flex-1 px-2">
+<!-- Active Tab: Dashboard -->
+<a aria-current="page" class="flex items-center gap-3 bg-red-600 text-white rounded-lg px-4 py-3 mx-2 my-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="dashboard" data-weight="fill">dashboard</span>
+<span class="font-['Lexend'] text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-lg px-4 py-3 mx-2 my-1" href="#">
+<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
+<span class="font-['Lexend'] text-sm font-medium">PDV</span>
+</a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-lg px-4 py-3 mx-2 my-1" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Lexend'] text-sm font-medium">Estoque</span>
+</a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-lg px-4 py-3 mx-2 my-1" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+<span class="font-['Lexend'] text-sm font-medium">Fichas</span>
+</a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-lg px-4 py-3 mx-2 my-1" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-['Lexend'] text-sm font-medium">Fechamento</span>
+</a>
+<a class="flex items-center gap-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 rounded-lg px-4 py-3 mx-2 my-1" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-['Lexend'] text-sm font-medium">Suporte</span>
+</a>
+</div>
+<div class="px-4 mt-auto">
+<button class="w-full bg-red-600 text-white font-label-bold text-label-bold h-12 rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Novo Pedido
+            </button>
+</div>
+</nav>
+<!-- Mobile TopAppBar -->
+<header class="md:hidden flex justify-between items-center h-16 px-6 w-full fixed top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-white/10">
+<div class="text-2xl font-black text-red-600 dark:text-red-500 tracking-tighter">
+            Alvorada OS
+        </div>
+<div class="flex items-center gap-4 text-red-600 dark:text-red-500">
+<button class="hover:bg-white/5 hover:text-white transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-white/5 hover:text-white transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col md:ml-0 pt-16 md:pt-0 min-h-screen">
+<div class="p-gutter md:p-margin lg:p-xl max-w-7xl mx-auto w-full flex-1 flex flex-col gap-lg">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-1">Visão Geral</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Sexta-feira, 24 de Novembro</p>
+</div>
+</header>
+<!-- Quick Access Grid (Bento Style) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter auto-rows-[160px]">
+<!-- PDV Tile (Large) -->
+<a class="group sm:col-span-2 sm:row-span-2 bg-surface-container-high rounded-xl border border-white/10 p-lg flex flex-col justify-between relative overflow-hidden transition-all hover:border-red-600 hover:bg-surface-bright focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-surface-dim" href="#">
+<div class="absolute inset-y-0 left-0 w-1 bg-red-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+<div class="flex justify-between items-start">
+<div class="w-14 h-14 bg-red-600/20 text-red-500 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl" data-icon="point_of_sale">point_of_sale</span>
+</div>
+<span class="font-label-bold text-label-bold text-red-500 bg-red-600/10 px-3 py-1 rounded-full">Ativo</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 group-hover:text-white transition-colors">Ponto de Venda</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Iniciar vendas, gerenciar carrinhos e pagamentos.</p>
+</div>
+</a>
+<!-- Estoque Tile -->
+<a class="group bg-surface-container-high rounded-xl border border-white/10 p-md flex flex-col justify-between relative overflow-hidden transition-all hover:border-red-600 hover:bg-surface-bright focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-surface-dim" href="#">
+<div class="absolute inset-x-0 top-0 h-1 bg-red-600 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+<div class="w-10 h-10 bg-white/5 text-on-surface rounded-lg flex items-center justify-center group-hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Estoque</h3>
+<p class="text-sm text-on-surface-variant">2 alertas</p>
+</div>
+</a>
+<!-- Fichas Tile -->
+<a class="group bg-surface-container-high rounded-xl border border-white/10 p-md flex flex-col justify-between relative overflow-hidden transition-all hover:border-red-600 hover:bg-surface-bright focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-surface-dim" href="#">
+<div class="absolute inset-x-0 top-0 h-1 bg-red-600 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+<div class="w-10 h-10 bg-white/5 text-on-surface rounded-lg flex items-center justify-center group-hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Fichas</h3>
+<p class="text-sm text-on-surface-variant">Controle de consumo</p>
+</div>
+</a>
+<!-- Fechamento Tile -->
+<a class="group bg-surface-container-high rounded-xl border border-white/10 p-md flex flex-col justify-between relative overflow-hidden transition-all hover:border-red-600 hover:bg-surface-bright focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-surface-dim" href="#">
+<div class="absolute inset-x-0 bottom-0 h-1 bg-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+<div class="w-10 h-10 bg-white/5 text-on-surface rounded-lg flex items-center justify-center group-hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Fechamento</h3>
+<p class="text-sm text-on-surface-variant">Caixa atual</p>
+</div>
+</a>
+<!-- Suporte Tile -->
+<a class="group bg-surface-container-high rounded-xl border border-white/10 p-md flex flex-col justify-between relative overflow-hidden transition-all hover:border-red-600 hover:bg-surface-bright focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-surface-dim" href="#">
+<div class="absolute inset-x-0 bottom-0 h-1 bg-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+<div class="w-10 h-10 bg-white/5 text-on-surface rounded-lg flex items-center justify-center group-hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Suporte</h3>
+<p class="text-sm text-on-surface-variant">Central de ajuda</p>
+</div>
+</a>
+</div>
+<!-- Recent Activity Skeleton (to fill space logically) -->
+<div class="mt-8 flex-1">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Atividade Recente</h3>
+<div class="bg-surface-container-high rounded-xl border border-white/10 p-1 flex flex-col">
+<!-- Row 1 -->
+<div class="flex items-center justify-between p-4 border-b border-white/5 min-h-[56px]">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="font-body-md text-body-md text-on-surface">Venda #4928</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant">R$ 145,00</span>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between p-4 border-b border-white/5 min-h-[56px]">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<span class="font-body-md text-body-md text-on-surface">Estoque: Cerveja IPA atualizado</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant">Há 10 min</span>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center justify-between p-4 min-h-[56px]">
+<div class="flex items-center gap-4">
+<div class="w-2 h-2 rounded-full bg-red-500"></div>
+<span class="font-body-md text-body-md text-on-surface">Venda #4927</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant">R$ 32,50</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

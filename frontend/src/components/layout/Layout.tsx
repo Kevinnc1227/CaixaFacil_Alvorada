@@ -9,7 +9,6 @@ export default function Layout() {
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
     return (
-        <div className="bg-cf-bg text-cf-text flex h-screen overflow-hidden flex-col md:flex-row cf-noise">
         <div className="bg-background text-on-background flex h-screen overflow-hidden selection-red flex-col md:flex-row relative">
             <Sidebar />
             
@@ -62,10 +61,6 @@ export default function Layout() {
             </div>
 
             <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-                {/* Mobile Header */}
-                <header className="flex justify-between items-center h-16 px-6 w-full bg-cf-surface/80 backdrop-blur-md border-b border-cf-border flex-shrink-0 z-10 md:hidden">
-                    <div className="font-black text-xl tracking-tighter text-cf-text">
-                        Caixa<span className="text-cf-accent">Facil</span>
                 <header className="flex items-center h-16 px-4 md:px-6 w-full bg-slate-950/95 backdrop-blur-md border-b border-white/10 flex-shrink-0 z-10 gap-3">
                     <button onClick={toggleMobileMenu} className="md:hidden text-slate-400 hover:text-white p-2 -ml-2">
                         <span className="material-symbols-outlined">menu</span>
@@ -79,8 +74,7 @@ export default function Layout() {
                     </div>
                 </header>
 
-                {/* Dashboard Content */}
-                <section className="flex-1 overflow-auto p-4 md:p-8 relative z-0 cf-scroll">
+                <section className="flex-1 overflow-auto p-xs md:p-md relative z-0">
                     <Outlet />
                 </section>
             </main>

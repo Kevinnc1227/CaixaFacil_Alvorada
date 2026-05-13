@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
-@import './styles/design-system.css';
 
 @tailwind base;
 @tailwind components;
@@ -14,8 +12,6 @@
   *::before,
   *::after {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
   }
 
   html {
@@ -23,32 +19,10 @@
   }
 
   body {
-    background: var(--cf-bg);
-    color: var(--cf-text);
-    font-family: var(--cf-font-sans);
-    font-size: var(--cf-text-base);
+    @apply bg-background text-on-background font-sans antialiased;
+    font-family: 'Lexend', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.5;
-    cursor: default;
-    /* Transition on theme change */
-    transition: background-color 250ms ease, color 250ms ease;
-  }
-
-  /* Prevent blinking text cursor on non-editable elements */
-  *:not(input):not(textarea):not([contenteditable="true"]) {
-    caret-color: transparent;
-  }
-
-  /* Restore correct cursor for interactive elements */
-  a, button, [role="button"], label, select,
-  [tabindex]:not([tabindex="-1"]) {
-    cursor: pointer;
-  }
-
-  input, textarea, [contenteditable="true"] {
-    cursor: text;
-    caret-color: var(--cf-accent);
   }
 
   /* Prevent iOS zoom on focus */
@@ -58,8 +32,8 @@
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -67,22 +41,15 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--cf-border-strong);
-    border-radius: 3px;
+    @apply bg-outline-variant rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--cf-muted);
-  }
-
-  /* Selection */
-  ::selection {
-    background: var(--cf-accent-glow);
-    color: var(--cf-accent);
+    @apply bg-outline;
   }
 }
 
-/* ─── App-level Components ─── */
+/* ─── Components ─── */
 @layer components {
 
   /* Material Symbols */
@@ -90,62 +57,58 @@
     font-family: 'Material Symbols Outlined';
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     user-select: none;
-    flex-shrink: 0;
   }
 
   .material-symbols-outlined.fill {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 
-  /* ─ Legacy classes (durante migração, mapeiam para cf-* tokens) ─ */
-
+  /* Primary Button (Vermelho) */
   .btn-primary {
-    @apply cf-btn cf-btn-primary;
-    padding: 0.75rem 1.25rem;
+    @apply bg-secondary-container hover:bg-error-container text-white rounded-lg text-headline-md transition-all duration-200 active:scale-[0.98] border border-red-500/30 shadow-lg shadow-red-900/20 flex items-center justify-center gap-2 px-md py-3;
     min-height: 48px;
-    font-size: var(--cf-text-sm);
-    border-radius: var(--cf-radius);
   }
 
+  /* Secondary Button */
   .btn-secondary {
-    @apply cf-btn cf-btn-secondary;
-    padding: 0.75rem 1.25rem;
+    @apply bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-label-bold border border-outline-variant transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 px-md py-3;
     min-height: 48px;
-    font-size: var(--cf-text-sm);
-    border-radius: var(--cf-radius);
   }
 
+  /* Card */
   .card {
-    @apply cf-card;
+    @apply bg-surface-container border border-outline-variant rounded-lg overflow-hidden;
   }
 
+  /* Input */
   .input {
-    @apply cf-input;
+    @apply bg-surface-container-lowest border border-outline-variant text-on-surface placeholder:text-on-surface-variant rounded-lg px-md py-3 focus:outline-none focus:border-primary-fixed-dim transition-colors text-body-md w-full;
+  }
+
+  /* Badge */
+  .badge-error {
+    @apply bg-secondary-container text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center;
   }
 
   /* Status Tags */
   .tag {
-    @apply cf-badge;
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide;
   }
 
   .tag-open {
-    @apply cf-badge-accent;
+    @apply bg-secondary-container/30 text-secondary-fixed-dim;
   }
 
   .tag-ongoing {
-    @apply cf-badge-yellow;
+    @apply bg-yellow-900/30 text-yellow-300;
   }
 
   .tag-done {
-    @apply cf-badge-green;
+    @apply bg-green-900/30 text-green-300;
   }
 
   .tag-closed {
-    @apply cf-badge-muted;
-  }
-
-  .badge-error {
-    @apply cf-badge cf-badge-red;
+    @apply bg-outline-variant/30 text-on-surface-variant;
   }
 }
 
@@ -160,11 +123,7 @@
     scrollbar-width: none;
   }
 
-  .font-mono-price {
-    font-family: var(--cf-font-mono);
-    font-size: var(--cf-mono-price);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--cf-accent);
+  .selection-red ::selection {
+    @apply bg-secondary-container text-white;
   }
 }

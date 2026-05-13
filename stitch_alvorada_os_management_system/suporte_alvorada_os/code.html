@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ALVORADA OS - Central de Suporte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c6c6cf",
+                        "on-tertiary-container": "#848585",
+                        "error-container": "#93000a",
+                        "secondary-container": "#9b0217",
+                        "on-tertiary": "#2f3131",
+                        "surface-container-lowest": "#000c2b",
+                        "surface-tint": "#b9c5f2",
+                        "surface-dim": "#001135",
+                        "surface": "#001135",
+                        "secondary-fixed": "#ffdad7",
+                        "primary-container": "#0d1b3e",
+                        "on-primary-container": "#7784ad",
+                        "on-primary-fixed": "#0b1a3d",
+                        "on-secondary": "#68000c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#243458",
+                        "on-secondary-fixed": "#410004",
+                        "inverse-surface": "#d9e2ff",
+                        "surface-container-low": "#081a3d",
+                        "on-secondary-container": "#ffa39d",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "primary-fixed": "#dbe1ff",
+                        "inverse-primary": "#515d84",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-surface": "#d9e2ff",
+                        "on-error": "#690005",
+                        "outline-variant": "#45464e",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#202f54",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#8f9099",
+                        "on-primary": "#222f53",
+                        "surface-container": "#0d1e42",
+                        "secondary": "#ffb3ae",
+                        "background": "#001135",
+                        "primary-fixed-dim": "#b9c5f2",
+                        "surface-variant": "#243458",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary": "#b9c5f2",
+                        "on-background": "#d9e2ff",
+                        "surface-bright": "#29385d",
+                        "on-secondary-fixed-variant": "#930015",
+                        "tertiary-container": "#1b1d1d",
+                        "surface-container-high": "#19294d",
+                        "on-primary-fixed-variant": "#39456b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "margin": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Lexend"],
+                        "stat-lg": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-bold": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "display-lg": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-lg": ["40px", {"lineHeight": "1.0", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "fontWeight": "800"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md h-screen w-full flex overflow-hidden">
+<!-- SideNavBar (Web) -->
+<nav class="hidden md:flex bg-[#0D1B3E] h-screen w-64 border-r border-white/10 flex-col py-4 flat no shadows z-50">
+<div class="px-6 mb-8">
+<h1 class="text-[#C0272D] font-black text-xl tracking-wider">ALVORADA</h1>
+<p class="font-['Lexend'] text-sm font-medium text-slate-400">Canteen Ops</p>
+</div>
+<ul class="flex-1 flex flex-col font-['Lexend'] text-sm font-medium">
+<li>
+<a class="flex items-center px-6 py-3 gap-4 text-slate-300 hover:bg-white/5 hover:text-white transition-all active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 gap-4 text-slate-300 hover:bg-white/5 hover:text-white transition-all active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
+                    PDV
+                </a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 gap-4 text-slate-300 hover:bg-white/5 hover:text-white transition-all active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                    Estoque
+                </a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 gap-4 text-slate-300 hover:bg-white/5 hover:text-white transition-all active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+                    Fichas
+                </a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 gap-4 text-slate-300 hover:bg-white/5 hover:text-white transition-all active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+                    Caixa
+                </a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 gap-4 bg-white/5 text-[#C0272D] border-r-4 border-[#C0272D] active:bg-[#C0272D]/10" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent" data-weight="fill" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+                    Suporte
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Viewport -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- TopAppBar (Mobile) -->
+<header class="md:hidden bg-[#0D1B3E] flex justify-between items-center px-6 h-16 w-full docked full-width top-0 border-b border-white/10 flat no shadows z-40">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-black text-[#C0272D] font-['Lexend'] uppercase tracking-wider font-bold">ALVORADA OS</span>
+</div>
+<div class="flex items-center gap-4 text-[#C0272D]">
+<button class="hover:bg-white/5 transition-colors active:scale-95 duration-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="hover:bg-white/5 transition-colors active:scale-95 duration-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-white/5 transition-colors active:scale-95 duration-100 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 overflow-y-auto p-md md:p-margin bg-background">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-lg gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Central de Suporte</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Gerencie chamados e acesse recursos de ajuda operacional.</p>
+</div>
+<button class="bg-secondary-container hover:bg-on-secondary text-secondary-fixed font-label-bold text-label-bold px-md py-sm rounded border border-white/10 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                    NOVO CHAMADO
+                </button>
+</div>
+<!-- Contact Cards (Bento Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<!-- WhatsApp -->
+<a class="bg-surface-container border border-outline-variant rounded-lg p-md flex items-center gap-md hover:bg-surface-container-high hover:border-outline transition-colors active:border-secondary-container group" href="#">
+<div class="bg-surface-variant text-primary rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 group-hover:text-inverse-surface">
+<span class="material-symbols-outlined" data-icon="forum">forum</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface">WhatsApp Suporte</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-xs">Resposta em até 15 min</p>
+</div>
+</a>
+<!-- Email -->
+<a class="bg-surface-container border border-outline-variant rounded-lg p-md flex items-center gap-md hover:bg-surface-container-high hover:border-outline transition-colors active:border-secondary-container group" href="#">
+<div class="bg-surface-variant text-primary rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 group-hover:text-inverse-surface">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface">E-mail Técnico</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-xs">Para problemas complexos</p>
+</div>
+</a>
+<!-- Docs -->
+<a class="bg-surface-container border border-outline-variant rounded-lg p-md flex items-center gap-md hover:bg-surface-container-high hover:border-outline transition-colors active:border-secondary-container group" href="#">
+<div class="bg-surface-variant text-primary rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0 group-hover:text-inverse-surface">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface">Base de Conhecimento</h3>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-xs">Manuais do sistema PDV</p>
+</div>
+</a>
+</div>
+<!-- Tickets List Area -->
+<div class="bg-surface-container border border-outline-variant rounded-lg flex flex-col">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-high rounded-t-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface text-lg">Chamados Recentes</h3>
+<button class="text-primary font-label-bold text-label-bold hover:text-inverse-surface transition-colors flex items-center gap-1">
+                        Ver Todos
+                        <span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="flex flex-col">
+<!-- Ticket Item (Active/Red) -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-md border-b border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer min-h-[64px] gap-sm">
+<div class="flex items-start md:items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-error-container/20 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error" data-icon="error">error</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Falha de sincronização na Maquininha 03 (Setor Leste)</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">#TKT-9024</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Há 15 minutos</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-start md:justify-end">
+<span class="bg-error-container text-on-error-container font-label-bold text-label-bold text-xs px-3 py-1 rounded-full border border-error/30 uppercase tracking-wide">
+                                Aberto
+                            </span>
+</div>
+</div>
+<!-- Ticket Item (In Progress) -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-md border-b border-outline-variant hover:bg-surface-container-high transition-colors cursor-pointer min-h-[64px] gap-sm">
+<div class="flex items-start md:items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="sync">sync</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-surface line-clamp-1">Atualização de cardápio não reflete no PDV</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">#TKT-9018</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-body-md text-body-md text-on-surface-variant text-xs">Hoje, 10:42</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-start md:justify-end">
+<span class="bg-surface-variant text-primary font-label-bold text-label-bold text-xs px-3 py-1 rounded-full border border-primary/20 uppercase tracking-wide">
+                                Em andamento
+                            </span>
+</div>
+</div>
+<!-- Ticket Item (Resolved) -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-md hover:bg-surface-container-high transition-colors cursor-pointer min-h-[64px] gap-sm">
+<div class="flex items-start md:items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-on-surface-variant line-clamp-1">Erro de login do operador (Caixa Central)</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-body-md text-body-md text-outline text-xs">#TKT-8992</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-body-md text-body-md text-outline text-xs">Ontem, 18:30</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-start md:justify-end">
+<span class="bg-surface-container-lowest text-on-surface-variant font-label-bold text-label-bold text-xs px-3 py-1 rounded-full border border-outline-variant uppercase tracking-wide">
+                                Resolvido
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,165 +1,101 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { STORAGE_KEYS } from '../api/api';
-import { Lock, ArrowRight, AlertTriangle } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import { authApi } from '../api/api';
 
 export default function Login() {
-    // Hookzinho maroto pra navegar entre as páginas depois que o login der certo
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    
-    // Nossos estados do formulário. Chamei de "identificador" porque o cara pode logar tanto com email quanto com o username
-    const [identificador, setIdentificador] = useState(''); 
-    const [senha, setSenha] = useState('');
-    
-    // Controle de UI pra mostrar erro ou estado de carregamento pro cliente não ficar clicando que nem doido
-    const [erro, setErro] = useState('');
-    const [loading, setLoading] = useState(false);
 
-    // Função que faz o "Heavy Lifting" da autenticação
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault(); // Sem reload na página, por favor!
-        setErro('');
-        setLoading(true);
+    const loginMutation = useMutation({
+        mutationFn: async () => {
+            const res = await authApi.post('/login', {
+                email,
+                senha: password
+            });
+            return res.data;
+        },
+        onSuccess: (data) => {
+            if (data.token) localStorage.setItem('alvorada_jwt', data.token);
+            if (data.user) localStorage.setItem('alvorada_user', JSON.stringify(data.user));
+            toast.success('Login aprovado!');
+            navigate('/pdv');
+        },
+        onError: (error: any) => {
+            const message = error.response?.data?.error || 'Falha ao autenticar. Tente novamente.';
+            toast.error(message);
+        }
+    });
 
-        try {
-            // Bate no backend enviando os dados...
-            const { data } = await api.post('/auth/login', { identificador, senha });
-
-            // Opa, login sucesso! Guarda o Token e os dados do usuário no localStorage.
-            // Uso constantes (STORAGE_KEYS) pra evitar erro de digitação boba, tipo "T0ken"
-            localStorage.setItem(STORAGE_KEYS.TOKEN, data.token);
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
-
-            // Aqui é o pulo do gato do roteamento:
-            // Se for o chefão (SUPERADMIN), mando direto pro painel de gestão de empresas.
-            // Se for um mero mortal (OPERADOR, etc), vai pro Dashboard normal do sistema.
-            if (data.user.perfil === 'SUPERADMIN') {
-                navigate('/admin');
-            } else {
-                navigate('/dashboard');
-            }
-        } catch (err: any) {
-            // Se falhou, mostro a mensagem bonitinha que a API mandou ou uma genérica de backup
-            setErro(err.response?.data?.error || 'Erro ao fazer login. Verifique suas credenciais.');
-        } finally {
-            // Independente se deu certo ou errado, tiro o botão do modo "loading"
-            setLoading(false);
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (email && password) {
+            loginMutation.mutate();
         }
     };
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center bg-[var(--cf-bg)] p-6 overflow-hidden cf-noise">
-            {/* --- Efeito de Fundo Monumental Brutalista --- */}
-            {/* Coloquei esse texto gigante atrás de tudo. Ele dá um peso pro design que fica absurdo de foda. */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 select-none overflow-hidden" aria-hidden>
-                <span 
-                    className="font-black whitespace-nowrap"
-                    style={{ 
-                        WebkitTextStroke: '2px var(--cf-border-strong)',
-                        color: 'transparent',
-                        fontSize: 'clamp(8rem, 20vw, 24rem)',
-                        letterSpacing: '-0.05em',
-                        lineHeight: '0.8'
-                    }}
-                >
-                    CAIXAFACIL
-                </span>
-            </div>
+        <div className="flex h-screen bg-background items-center justify-center p-md">
+            <div className="card w-full max-w-md p-lg shadow-2xl relative overflow-hidden">
 
-            {/* --- Container Principal --- */}
-            <div className="relative w-full max-w-lg z-10 space-y-6">
-                
-                {/* Logo e Branding da Empresa */}
-                <div className="text-center">
-                    <div className="inline-flex items-center gap-4 mb-2">
-                        {/* Aquele ícone caixa preta forte que o cliente olha e fala "Caramba, que sistema sério!" */}
-                        <div className="w-14 h-14 bg-[var(--cf-accent)] flex items-center justify-center font-black text-[var(--cf-bg)] text-2xl border-4 border-[var(--cf-border-strong)]">
-                            CF
-                        </div>
-                        <span className="text-4xl font-black tracking-tighter">
-                            <span className="text-[var(--cf-text)]">CAIXA</span><span className="text-[var(--cf-accent)]">FACIL</span>
-                        </span>
+                {/* Decorative background glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] aspect-square bg-secondary-container/20 rounded-full blur-[100px] pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col items-center mb-8">
+                    <div className="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center border border-outline-variant mb-4 shadow-inner">
+                        <span className="material-symbols-outlined text-white text-3xl">sports_soccer</span>
                     </div>
-                    <p className="text-[var(--cf-muted)] text-xs tracking-[0.2em] uppercase font-bold">by K-HUB Soluções</p>
+                    <h1 className="font-display-lg text-display-lg text-primary text-center tracking-tight mb-2">CaixaFácil</h1>
+                    <p className="font-body-lg text-body-lg text-on-surface-variant text-center">Alvorada Esporte Clube</p>
                 </div>
 
-                {/* Form Brutalista Pesado */}
-                {/* Repara na borda de 4px e no shadow sólido, isso que dá a "cara de terminal/brutal" do app */}
-                <form
-                    onSubmit={handleLogin}
-                    className="bg-[var(--cf-surface)] border-4 border-[var(--cf-border-strong)] p-8 sm:p-10 space-y-8 shadow-[8px_8px_0_0_var(--cf-accent)]"
-                >
-                    <div>
-                        <h1 className="text-2xl font-black text-[var(--cf-text)] tracking-tight uppercase flex items-center gap-2">
-                            <Lock className="w-6 h-6 text-[var(--cf-accent)]" /> Acesso Restrito
-                        </h1>
-                        <p className="text-[var(--cf-muted)] text-sm mt-1">Insira suas credenciais corporativas para continuar.</p>
-                    </div>
-
-                    <div className="space-y-5">
-                        {/* Campo de Identificador (Email/Username) */}
-                        <div className="space-y-2">
-                            <label htmlFor="login-identificador" className="block text-xs font-black text-[var(--cf-muted)] uppercase tracking-widest">
-                                E-mail ou usuário
-                            </label>
+                <form onSubmit={handleLogin} className="relative z-10 flex flex-col gap-md">
+                    <div className="flex flex-col gap-xs">
+                        <label className="font-label-bold text-label-bold text-on-surface ml-1">E-mail de Acesso</label>
+                        <div className="relative">
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
                             <input
-                                id="login-identificador"
-                                type="text"
-                                className="cf-input w-full"
-                                placeholder="seu@email.com ou usuario"
-                                value={identificador}
-                                onChange={e => setIdentificador(e.target.value)}
-                                autoComplete="username"
+                                type="email"
                                 required
+                                placeholder="operador@alvorada.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="input pl-10"
+                                disabled={loginMutation.isPending}
                             />
                         </div>
+                    </div>
 
-                        {/* Campo de Senha */}
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="login-senha" className="block text-xs font-black text-[var(--cf-muted)] uppercase tracking-widest">
-                                    Senha
-                                </label>
-                            </div>
+                    <div className="flex flex-col gap-xs">
+                        <label className="font-label-bold text-label-bold text-on-surface ml-1">Senha</label>
+                        <div className="relative">
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
                             <input
-                                id="login-senha"
                                 type="password"
-                                className="cf-input w-full font-mono tracking-widest"
-                                placeholder="••••••••"
-                                value={senha}
-                                onChange={e => setSenha(e.target.value)}
-                                autoComplete="current-password"
                                 required
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="input pl-10"
+                                disabled={loginMutation.isPending}
                             />
                         </div>
                     </div>
 
-                    {/* Exibição de Erros (Alerta vermelho brutal) */}
-                    {erro && (
-                        <div className="border-2 border-[var(--cf-red)] bg-[var(--cf-red-bg)] px-4 py-3 flex items-start gap-3">
-                            <AlertTriangle className="w-5 h-5 text-[var(--cf-red)] flex-shrink-0 mt-0.5" />
-                            <p className="text-sm font-bold text-[var(--cf-red)] uppercase tracking-wide">
-                                {erro}
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Botão Primário Monstrão de Enviar */}
-                    <button
-                        id="login-submit"
-                        type="submit"
-                        disabled={loading}
-                        className="cf-btn cf-btn-primary w-full py-4 text-sm font-black tracking-widest uppercase flex items-center justify-center gap-3 disabled:opacity-50"
-                    >
-                        {loading ? 'AUTENTICANDO...' : (<>Acessar Sistema <ArrowRight className="w-5 h-5" /></>)}
+                    <button type="submit" disabled={loginMutation.isPending} className="btn-primary mt-4 group">
+                        {loginMutation.isPending ? 'Verificando...' : 'Entrar'}
+                        {!loginMutation.isPending && (
+                            <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+                        )}
                     </button>
                 </form>
 
-                {/* Footer/Retorno com linkezinho maroto */}
-                <div className="text-center">
-                    <a href="/" className="inline-flex items-center text-xs font-black text-[var(--cf-muted)] hover:text-[var(--cf-accent)] uppercase tracking-[0.15em] transition-colors hover:underline underline-offset-4">
-                        &lt; Retornar ao Site Público
-                    </a>
+                <div className="relative z-10 text-center mt-8">
+                    <p className="text-xs text-on-surface-variant/50 font-lexend">
+                        Sistema de Gestão • Versão 1.0 MVP
+                    </p>
                 </div>
             </div>
         </div>
