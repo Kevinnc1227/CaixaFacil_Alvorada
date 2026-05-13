@@ -1,49 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import api from '../api/api';
 
+// Aqui eu defino o tipo Ficha pra o TypeScript parar de me xingar e eu saber exatamente o que vem da API.
 type Ficha = { id: number; clienteId: number; nome: string; cpf: string; status: 'ABERTA' | 'PAGA'; totalAcumulado: number; };
+
+// Formas de pagamento aceitas na hora de fechar a ficha.
 const FORMAS = ['DINHEIRO', 'PIX', 'CARTAO'];
 
 export default function Fichas() {
     const queryClient = useQueryClient();
+    
+    // Estados para controle da UI.
+    // O que o usuário tá buscando?
     const [search, setSearch] = useState('');
+    // Filtro rápido: Todas, Em Aberto ou Pagas.
     const [filter, setFilter] = useState('Todas');
+    
+    // Controle dos modais (Abrir nova ficha ou fechar uma existente).
     const [showNovoCliente, setShowNovoCliente] = useState(false);
     const [showFechar, setShowFechar] = useState<Ficha | null>(null);
     const [formaPgto, setFormaPgto] = useState('DINHEIRO');
+    
+    // Formulário do novo cliente
     const [novoForm, setNovoForm] = useState({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' });
 
+    // Bato na API pra pegar todas as fichas.
+    // O react-query já gerencia o loading e o cache pra mim.
     const { data: fichasData = [], isLoading } = useQuery({
         queryKey: ['fichas'],
         queryFn: async () => { const res = await api.get('/fichas/abertas/lista'); return res.data; }
     });
 
+    // Mutação pra cadastrar o cliente (e a API já abre uma ficha pra ele no backend).
     const criarClienteMutation = useMutation({
         mutationFn: async () => api.post('/fichas', novoForm),
-        onSuccess: () => { toast.success('Cliente cadastrado!'); queryClient.invalidateQueries({ queryKey: ['fichas'] }); setShowNovoCliente(false); setNovoForm({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' }); },
+        onSuccess: () => { 
+            toast.success('Cliente cadastrado!'); 
+            // Invalido a query pra forçar o React Query a buscar a lista atualizada.
+            queryClient.invalidateQueries({ queryKey: ['fichas'] }); 
+            setShowNovoCliente(false); 
+            // Limpo o form pro próximo
+            setNovoForm({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' }); 
+        },
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao cadastrar.')
     });
 
+    // Mutação pra fechar a conta do caboclo.
     const fecharMutation = useMutation({
-        mutationFn: async () => { if (!showFechar) return; await api.post(`/fichas/fichas/${showFechar.id}/fechar`, { formaPagamento: formaPgto }); },
-        onSuccess: () => { toast.success('Conta fechada!'); queryClient.invalidateQueries({ queryKey: ['fichas'] }); setShowFechar(null); },
+        mutationFn: async () => { 
+            if (!showFechar) return; 
+            await api.post(`/fichas/fichas/${showFechar.id}/fechar`, { formaPagamento: formaPgto }); 
+        },
+        onSuccess: () => { 
+            toast.success('Conta fechada!'); 
+            queryClient.invalidateQueries({ queryKey: ['fichas'] }); 
+            setShowFechar(null); 
+        },
         onError: (e: any) => toast.error(e.response?.data?.error || 'Não foi possível fechar.')
     });
 
-    const filteredFichas = fichasData.filter((f: Ficha) => {
-        if (filter === 'Em Aberto' && f.status !== 'ABERTA') return false;
-        if (filter === 'Pagas' && f.status !== 'PAGA') return false;
-        if (search) { const s = search.toLowerCase(); return (f.nome || '').toLowerCase().includes(s) || (f.cpf || '').includes(s); }
-        return true;
-    });
+    // Otimização braba aqui: só refaço a filtragem se os dados ou os filtros mudarem.
+    // Assim evito gargalo de CPU se a lista crescer muito.
+    const filteredFichas = useMemo(() => {
+        return fichasData.filter((f: Ficha) => {
+            if (filter === 'Em Aberto' && f.status !== 'ABERTA') return false;
+            if (filter === 'Pagas' && f.status !== 'PAGA') return false;
+            if (search) { 
+                const s = search.toLowerCase(); 
+                return (f.nome || '').toLowerCase().includes(s) || (f.cpf || '').includes(s); 
+            }
+            return true;
+        });
+    }, [fichasData, filter, search]);
 
-    const totalAberto = fichasData.filter((f: Ficha) => f.status === 'ABERTA').reduce((a: number, f: Ficha) => a + (f.totalAcumulado || 0), 0);
-    const countAberto = fichasData.filter((f: Ficha) => f.status === 'ABERTA').length;
+    // Mesma coisa pros totais do cabeçalho.
+    const { totalAberto, countAberto } = useMemo(() => {
+        const abertas = fichasData.filter((f: Ficha) => f.status === 'ABERTA');
+        return {
+            totalAberto: abertas.reduce((a: number, f: Ficha) => a + (f.totalAcumulado || 0), 0),
+            countAberto: abertas.length
+        };
+    }, [fichasData]);
 
     return (
         <div className="flex flex-col gap-5 h-full">
+            {/* Cabeçalho da página */}
             <header className="cf-page-header flex-shrink-0">
                 <div className="flex items-center gap-4">
                     <div className="cf-page-icon"><span className="material-symbols-outlined text-2xl">receipt_long</span></div>
@@ -60,6 +103,7 @@ export default function Fichas() {
                 </button>
             </header>
 
+            {/* Corpo principal: Filtros e Tabela */}
             <div className="flex-1 cf-card overflow-hidden flex flex-col min-h-0">
                 <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 border-b border-cf-border bg-cf-surface-high flex-shrink-0">
                     <div className="relative flex-1 max-w-sm">
@@ -67,6 +111,7 @@ export default function Fichas() {
                         <input className="cf-input pl-10" placeholder="Buscar por nome ou CPF..." value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
                     <div className="flex gap-2">
+                        {/* Botõezinhos de filtro bonitos */}
                         {['Todas', 'Em Aberto', 'Pagas'].map(f => (
                             <button key={f} onClick={() => setFilter(f)}
                                 className={`px-4 py-2 rounded-full text-xs font-bold font-sans whitespace-nowrap transition-all border ${filter === f ? 'bg-cf-accent text-cf-accent-text border-cf-accent' : 'bg-cf-surface border-cf-border text-cf-muted hover:border-cf-accent/50'}`}>
@@ -89,8 +134,10 @@ export default function Fichas() {
                         </thead>
                         <tbody>
                             {isLoading ? (
+                                // Loading spinner lindão da Caixa Fácil
                                 <tr><td colSpan={5} className="p-8 text-center"><div className="w-8 h-8 border-2 border-cf-accent border-t-transparent rounded-full animate-spin mx-auto"></div></td></tr>
                             ) : filteredFichas.length === 0 ? (
+                                // Tela de vazio
                                 <tr><td colSpan={5} className="p-12 text-center text-cf-muted/50">
                                     <span className="material-symbols-outlined text-5xl block mb-2">assignment</span>
                                     <p className="font-mono text-xs uppercase tracking-wider">Nenhuma ficha encontrada</p>
@@ -99,6 +146,7 @@ export default function Fichas() {
                                 <tr key={f.id}>
                                     <td>
                                         <div className="flex items-center gap-3">
+                                            {/* Avatar gerado pela primeira letra do nome */}
                                             <div className="w-9 h-9 rounded bg-cf-accent-glow border border-cf-accent/20 flex items-center justify-center text-cf-accent text-sm font-bold font-mono flex-shrink-0">
                                                 {(f.nome || '?').charAt(0).toUpperCase()}
                                             </div>
@@ -111,6 +159,7 @@ export default function Fichas() {
                                     </td>
                                     <td className="text-right"><span className="cf-price">{(f.totalAcumulado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></td>
                                     <td className="text-center">
+                                        {/* Só posso receber de quem tá devendo (ABERTA) */}
                                         {f.status === 'ABERTA' && (
                                             <button onClick={() => { setShowFechar(f); setFormaPgto('DINHEIRO'); }} className="cf-btn cf-btn-primary text-xs py-1.5 px-3 min-h-0 h-8">
                                                 RECEBER
@@ -123,6 +172,8 @@ export default function Fichas() {
                     </table>
                 </div>
             </div>
+
+            {/* --- MODAIS --- */}
 
             {/* Modal Novo Cliente */}
             {showNovoCliente && (
@@ -162,6 +213,7 @@ export default function Fichas() {
                         </div>
                         <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">
                             <button onClick={() => setShowNovoCliente(false)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
+                            {/* Desabilito o botão se o nome tiver vazio ou se já estiver cadastrando (evita duplo clique) */}
                             <button onClick={() => criarClienteMutation.mutate()} disabled={!novoForm.nomeCompleto || criarClienteMutation.isPending} className="cf-btn cf-btn-primary flex-1">
                                 {criarClienteMutation.isPending ? 'Cadastrando...' : 'Cadastrar'}
                             </button>
@@ -212,3 +264,4 @@ export default function Fichas() {
         </div>
     );
 }
+

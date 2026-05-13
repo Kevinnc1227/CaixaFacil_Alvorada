@@ -160,4 +160,6 @@ scratch/
 *.cer
 id_rsa
 id_ed25519
-*.ppk
+*.ppkPLAN_REFACTOR.md
+
+memoria.md

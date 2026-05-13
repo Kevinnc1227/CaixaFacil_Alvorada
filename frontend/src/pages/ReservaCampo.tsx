@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { api } from '../api/api';
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
+// Aqui eu garanto que o Typescript saiba o que é um Cliente e uma Reserva.
 interface Cliente {
     id: number;
     nomeCompleto: string;
@@ -25,6 +26,8 @@ interface Reserva {
     criadoEm: string;
 }
 
+// Isso aqui é um mapinha pra facilitar a renderização visual dos status.
+// Dependendo do status, eu puxo a cor e o ícone certinho.
 const STATUS_META: Record<string, { label: string; color: string; icon: string }> = {
     CONFIRMADA: { label: 'Confirmada', color: 'text-emerald-400 bg-emerald-400/10', icon: 'check_circle' },
     PENDENTE: { label: 'Pendente', color: 'text-amber-400 bg-amber-400/10', icon: 'pending' },
@@ -35,9 +38,15 @@ const STATUS_META: Record<string, { label: string; color: string; icon: string }
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function ReservaCampo() {
     const queryClient = useQueryClient();
+    
+    // Estados do modal de criação
     const [showModal, setShowModal] = useState(false);
+    
+    // Se o cabra for um cliente novo, eu mudo o input pra texto e crio ele na hora
     const [isNovoCliente, setIsNovoCliente] = useState(false);
     const [novoClienteNome, setNovoClienteNome] = useState('');
+    
+    // Formulário padrão da reserva
     const [form, setForm] = useState({
         clienteId: '',
         dataReserva: new Date().toISOString().split('T')[0],
@@ -47,6 +56,7 @@ export default function ReservaCampo() {
     });
 
     // ── Queries ──
+    // Bato na API pra buscar as reservas e os clientes. O cache é automático pelo react-query.
     const { data: reservas = [], isLoading: loadingReservas } = useQuery<Reserva[]>({
         queryKey: ['reservasCampo'],
         queryFn: async () => (await api.get('/reservas-campo')).data,
@@ -58,6 +68,8 @@ export default function ReservaCampo() {
     });
 
     // ── Mutation: criar reserva ──
+    // Aqui rola a mágica: se for cliente novo, primeiro eu crio ele na API.
+    // Depois pego o ID que a API retornou e uso pra criar a reserva.
     const createMutation = useMutation({
         mutationFn: async () => {
             let finalClienteId = Number(form.clienteId);
@@ -67,6 +79,7 @@ export default function ReservaCampo() {
                 const clienteRes = await api.post('/clientes', {
                     nomeCompleto: novoClienteNome.trim()
                 });
+                // Pega o id do recém criado
                 finalClienteId = clienteRes.data.cliente.id;
             }
 
@@ -81,10 +94,14 @@ export default function ReservaCampo() {
         onSuccess: (res) => {
             const { reservaId, ticketId } = res.data;
             toast.success(`Reserva #${reservaId} criada! Ticket #${ticketId} aberto automaticamente.`, { duration: 5000 });
+            
+            // Invalido tudo que pode ter mudado no backend pra forçar um refresh na tela.
             queryClient.invalidateQueries({ queryKey: ['reservasCampo'] });
             queryClient.invalidateQueries({ queryKey: ['tickets'] });
             queryClient.invalidateQueries({ queryKey: ['caixaRelatorio'] });
             queryClient.invalidateQueries({ queryKey: ['clientes'] });
+            
+            // Reseto o modal
             setShowModal(false);
             setIsNovoCliente(false);
             setNovoClienteNome('');
@@ -96,6 +113,7 @@ export default function ReservaCampo() {
     });
 
     // ── Mutation: atualizar status ──
+    // Uso isso pros botões de Concluir ou Cancelar reserva.
     const statusMutation = useMutation({
         mutationFn: ({ id, status }: { id: number; status: string }) =>
             api.patch(`/reservas-campo/${id}/status`, { status }),
@@ -108,6 +126,7 @@ export default function ReservaCampo() {
     });
 
     // ── Cálculo de duração ──
+    // Uma matemáticazinha simples pra mostrar pro usuário quantas horas/minutos o campo foi alugado.
     const calcDuration = (inicio: string, fim: string) => {
         const [h1, m1] = inicio.split(':').map(Number);
         const [h2, m2] = fim.split(':').map(Number);
@@ -118,8 +137,13 @@ export default function ReservaCampo() {
         return h > 0 ? `${h}h${m > 0 ? m + 'min' : ''}` : `${m}min`;
     };
 
-    const totalReservas = reservas.filter(r => r.status === 'CONFIRMADA' || r.status === 'CONCLUIDA')
-        .reduce((acc, r) => acc + r.valorTotal, 0);
+    // ── Otimização: Total de Receita ──
+    // Uso useMemo pra não recalcular isso toda vez que eu digitar no modal de reserva.
+    const totalReservas = useMemo(() => {
+        return reservas
+            .filter(r => r.status === 'CONFIRMADA' || r.status === 'CONCLUIDA')
+            .reduce((acc, r) => acc + r.valorTotal, 0);
+    }, [reservas]);
 
     return (
         <div className="flex flex-col gap-md h-full max-w-6xl mx-auto w-full">
@@ -145,7 +169,7 @@ export default function ReservaCampo() {
                 </button>
             </header>
 
-            {/* ── KPI Cards ── */}
+            {/* ── KPI Cards (Indicadores chave) ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
                 <div className="bg-surface p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between min-h-[130px]">
                     <p className="text-sm text-on-surface-variant font-label-bold uppercase flex items-center gap-2">
@@ -180,10 +204,12 @@ export default function ReservaCampo() {
             {/* ── Tabela de Reservas ── */}
             <div className="flex-1 bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden">
                 {loadingReservas ? (
+                    // Loading maroto enquanto os dados não vêm
                     <div className="flex items-center justify-center h-48 text-on-surface-variant">
                         <span className="material-symbols-outlined animate-spin text-4xl">progress_activity</span>
                     </div>
                 ) : reservas.length === 0 ? (
+                    // Fallback se tiver vazio
                     <div className="flex flex-col items-center justify-center h-48 gap-3 text-on-surface-variant">
                         <span className="material-symbols-outlined text-6xl opacity-20">sports_soccer</span>
                         <p className="text-sm">Nenhuma reserva registrada ainda. Clique em "Nova Reserva".</p>
@@ -206,6 +232,7 @@ export default function ReservaCampo() {
                             </thead>
                             <tbody>
                                 {reservas.map((r) => {
+                                    // Pego os dados visuais baseados no status da reserva
                                     const meta = STATUS_META[r.status] ?? STATUS_META['PENDENTE'];
                                     return (
                                         <tr key={r.id} className="border-b border-outline-variant/50 hover:bg-on-surface/5 transition-colors">
@@ -236,6 +263,7 @@ export default function ReservaCampo() {
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
+                                                {/* Só libero os botões de ação se a reserva tiver CONFIRMADA */}
                                                 {r.status === 'CONFIRMADA' && (
                                                     <div className="flex gap-1">
                                                         <button
@@ -283,7 +311,7 @@ export default function ReservaCampo() {
                             </button>
                         </div>
 
-                        {/* Aviso: ticket automático */}
+                        {/* Aviso de Ticket Automático (UX mt boa) */}
                         <div className="mx-6 mt-4 flex items-start gap-2 bg-sky-400/10 border border-sky-400/20 rounded-lg p-3 text-sky-400 text-xs">
                             <span className="material-symbols-outlined text-[16px] mt-0.5">info</span>
                             <span>Um <strong>Ticket de Atendimento</strong> será aberto automaticamente ao confirmar a reserva. O valor será lançado no Caixa.</span>
@@ -368,7 +396,7 @@ export default function ReservaCampo() {
                                 </div>
                             </div>
 
-                            {/* Duração calculada */}
+                            {/* Duração calculada aparecendo dinamicamente */}
                             {form.horaInicio && form.horaFim && (
                                 <p className="text-xs text-on-surface-variant -mt-2">
                                     ⏱ Duração calculada: <strong className="text-on-surface">{calcDuration(form.horaInicio, form.horaFim)}</strong>
@@ -398,6 +426,7 @@ export default function ReservaCampo() {
                                 >
                                     Cancelar
                                 </button>
+                                {/* Desabilito se tiver carregando a mutation ou se faltar dado */}
                                 <button
                                     id="btn-confirmar-reserva"
                                     disabled={(isNovoCliente ? !novoClienteNome.trim() : !form.clienteId) || !form.dataReserva || !form.valorTotal || createMutation.isPending}
@@ -417,5 +446,4 @@ export default function ReservaCampo() {
             )}
         </div>
     );
-
 }

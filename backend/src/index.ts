@@ -9,6 +9,9 @@ import caixasRoutes from './routes/caixasRoutes';
 import ticketsRoutes from './routes/ticketsRoutes';
 import usuariosRoutes from './routes/usuariosRoutes';
 import reservasCampoRoutes from './routes/reservasCampoRoutes';
+import adminRoutes from './routes/adminRoutes';
+import leadsRoutes from './routes/leadsRoutes';
+import setupRoutes from './routes/setupRoutes';
 
 dotenv.config();
 
@@ -28,6 +31,9 @@ app.use('/api/caixa', caixasRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/reservas-campo', reservasCampoRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/leads', leadsRoutes);
+app.use('/api/setup', setupRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'ok', service: 'CaixaFacil Alvorada API - Todos Módulos Ativos' });
