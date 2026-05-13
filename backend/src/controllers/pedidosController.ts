@@ -1,34 +1,30 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { db } from '../db/db';
-import { pedidos, itensPedido, produtos, caixas, fichas } from '../db/schema';
+import { pedidos, itensPedido, produtos, fichas } from '../db/schema';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 
 export const createPedido = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const usuarioId = req.user!.id;
+        const orgId = req.user!.organizacaoId!;
         const { tipo, fichaId, itens, total } = req.body;
-        // itens = [{ produtoId, quantidade, precoUnitario }]
 
         if (!itens || itens.length === 0) {
             res.status(400).json({ error: 'Pedido vazio' });
             return;
         }
 
-        // Verificar caixa aberto do dia? 
-        // Regra: Não se fecha o caixa no meio do dia, apenas no final.
-
-        db.transaction((tx) => {
-            // 1. Criar pedido
-            const novoPedido = tx.insert(pedidos).values({
+        await db.transaction(async (tx) => {
+            const [novoPedido] = await tx.insert(pedidos).values({
                 usuarioId,
+                organizacaoId: orgId,
                 tipo,
                 status: tipo === 'PAGAR_AGORA' ? 'PAGO' : 'LANCADO_FICHA',
                 total,
                 fichaId: tipo === 'LANCAR_FICHA' ? fichaId : null
             }).returning().get();
 
-            // 2. Inserir itens e decrementar estoque
             for (const item of itens) {
                 tx.insert(itensPedido).values({
                     pedidoId: novoPedido.id,
@@ -36,6 +32,11 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
                     quantidade: item.quantidade,
                     precoUnitario: item.precoUnitario
                 }).run();
+
+                // Decrementa estoque apenas de produto da mesma org (segurança)
+                const produtoDb = await tx.select().from(produtos)
+                    .where(and(eq(produtos.id, item.produtoId), eq(produtos.organizacaoId, orgId)))
+                    .get();
 
                 // Decrementar estoque do produto
                 const produtoDb = tx.select().from(produtos).where(eq(produtos.id, item.produtoId)).get();
@@ -45,8 +46,14 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
                 }
             }
 
-            // 3. Se for na ficha, acumular valor
             if (tipo === 'LANCAR_FICHA' && fichaId) {
+                const fichaDb = await tx.select().from(fichas)
+                    .where(and(eq(fichas.id, fichaId), eq(fichas.organizacaoId, orgId)))
+                    .get();
+                if (fichaDb) {
+                    await tx.update(fichas)
+                        .set({ totalAcumulado: fichaDb.totalAcumulado + total })
+                        .where(eq(fichas.id, fichaId));
                 const fichaDb = tx.select().from(fichas).where(eq(fichas.id, fichaId)).get();
                 if (fichaDb) {
                     tx.update(fichas).set({ totalAcumulado: fichaDb.totalAcumulado + total }).where(eq(fichas.id, fichaId)).run();
@@ -61,17 +68,13 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
     }
 };
 
-export const listUltimosPedidos = async (req: Request, res: Response): Promise<void> => {
+export const listUltimosPedidos = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        // Apenas pedidos recentes para exibir na tela do relatorio
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // Simplificando o fetch para MVP
+        const orgId = req.user!.organizacaoId!;
         const results = await db.select().from(pedidos)
+            .where(eq(pedidos.organizacaoId, orgId))
             .limit(50)
             .orderBy(desc(pedidos.id));
-
         res.json(results);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao listar pedidos' });
