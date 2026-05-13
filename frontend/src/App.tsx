@@ -17,6 +17,7 @@ import AdminLeads from './pages/SuperAdmin/AdminLeads';
 import ReservaCampo from './pages/ReservaCampo';
 import OperatorManagement from './pages/OperatorManagement';
 import AdminRoute from './components/layout/AdminRoute';
+import PrivateRoute from './components/layout/PrivateRoute';
 import { STORAGE_KEYS } from './api/api';
 
 // Guard para rotas de admin
@@ -46,7 +47,7 @@ function App() {
                 </Route>
 
                 {/* App (tenant) */}
-                <Route element={<Layout />}>
+                <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
                     <Route path="dashboard" element={<Navigate to="/pdv" replace />} />
                     <Route path="pdv" element={<PDV />} />
                     <Route path="estoque" element={<Estoque />} />
