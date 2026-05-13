@@ -110,6 +110,7 @@ export const fecharCaixa = async (req: AuthRequest, res: Response): Promise<void
         const { totalVendas, totalFichas, totalReservas, totalBruto, totalCusto, lucroLiquido } = req.body;
 
         const [novoCaixa] = await db.insert(caixas).values({
+            organizacaoId: req.user!.organizacaoId!,
             totalVendas: totalVendas ?? 0,
             totalFichas: totalFichas ?? 0,
             totalReservas: totalReservas ?? 0,

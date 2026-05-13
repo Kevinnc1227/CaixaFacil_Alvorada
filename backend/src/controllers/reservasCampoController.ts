@@ -88,9 +88,10 @@ export const createReserva = async (req: AuthRequest, res: Response): Promise<vo
                 `Reserva ID: #${reservaCriada.id}`;
 
             const ticketCriado = tx.insert(tickets).values({
+                organizacaoId: req.user!.organizacaoId!,
                 usuarioId,
                 titulo: tituloTicket,
-                categoria: 'DUVIDA',   // Categoria neutra — indica atendimento de serviço
+                categoria: 'DUVIDA',
                 descricao: descricaoTicket,
                 status: 'ABERTO',
             }).returning().get();

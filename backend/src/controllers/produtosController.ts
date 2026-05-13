@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { db } from '../db/db';
 import { produtos, ajustesEstoque } from '../db/schema';
-import { eq, like, or } from 'drizzle-orm';
+import { eq, like } from 'drizzle-orm';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
-export const listProdutos = async (req: Request, res: Response): Promise<void> => {
+export const listProdutos = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { q, categoria } = req.query;
 
@@ -29,11 +29,13 @@ export const listProdutos = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-export const createProduto = async (req: Request, res: Response): Promise<void> => {
+export const createProduto = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
+        const orgId = req.user!.organizacaoId!;
         const { nome, categoria, precoVenda, precoCusto, qtdEstoque, qtdMinima } = req.body;
 
         const result = await db.insert(produtos).values({
+            organizacaoId: orgId,
             nome,
             categoria,
             precoVenda,
@@ -111,6 +113,7 @@ export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<v
         db.transaction((tx) => {
             // Registrar log de auditoria
             tx.insert(ajustesEstoque).values({
+                organizacaoId: req.user!.organizacaoId!,
                 produtoId,
                 usuarioId,
                 quantidade,

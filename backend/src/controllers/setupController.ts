@@ -1,15 +1,16 @@
 import { Request, Response } from 'express';
-import { db } from '../db/db';
-import { organizacoes } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from '../db/db.js';
+import { organizacoes } from '../db/schema.js';
+import { eq, sql } from 'drizzle-orm';
 
-// GET /api/setup/:token — retorna dados da org (sem auth)
+// Eu busco as informações da organização pelo token de setup.
+// Este endpoint é público — não exige JWT — porque é o primeiro acesso da org.
 export const getSetupInfo = async (req: Request, res: Response): Promise<void> => {
     try {
         const { token } = req.params;
 
         const org = await db.select().from(organizacoes)
-            .where(eq(organizacoes.setupToken, token))
+            .where(sql`${organizacoes.setupToken} = ${token}`)
             .get();
 
         if (!org) {
@@ -34,14 +35,15 @@ export const getSetupInfo = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-// PATCH /api/setup/:token — salva preferências e conclui setup
+// Eu salvo as preferências da organização e marco o setup como concluído.
+// Depois disso o link de setup para de funcionar — segurança por design.
 export const completeSetup = async (req: Request, res: Response): Promise<void> => {
     try {
         const { token } = req.params;
         const { temaPreferido, avisoRecibo } = req.body;
 
         const org = await db.select().from(organizacoes)
-            .where(eq(organizacoes.setupToken, token))
+            .where(sql`${organizacoes.setupToken} = ${token}`)
             .get();
 
         if (!org) {
@@ -60,7 +62,7 @@ export const completeSetup = async (req: Request, res: Response): Promise<void> 
                 avisoRecibo: avisoRecibo || org.avisoRecibo,
                 setupConcluido: true,
             })
-            .where(eq(organizacoes.setupToken, token));
+            .where(sql`${organizacoes.setupToken} = ${token}`);
 
         res.json({ message: 'Setup concluído com sucesso! Você já pode fazer login.' });
     } catch (error) {
