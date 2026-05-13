@@ -1,16 +1,21 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-const navItems = [
+export const navItems = [
     { path: '/pdv', label: 'PDV', icon: 'point_of_sale' },
     { path: '/estoque', label: 'Estoque', icon: 'inventory_2' },
     { path: '/fichas', label: 'Fichas', icon: 'confirmation_number' },
+    { path: '/reserva-campo', label: 'Campo', icon: 'sports_soccer' },
     { path: '/caixa', label: 'Fechamento', icon: 'account_balance_wallet' },
     { path: '/suporte', label: 'Suporte', icon: 'support_agent' },
     { path: '/config', label: 'Ajustes', icon: 'settings' },
 ];
 
 export default function Sidebar() {
+    const { user } = useAuth();
+
     return (
         <nav className="hidden md:flex flex-col bg-cf-surface h-screen w-[var(--cf-sidebar-w,240px)] border-r border-cf-border pt-4 pb-6 z-20 flex-shrink-0">
             <div className="px-6 mb-8 mt-2">
@@ -40,6 +45,25 @@ export default function Sidebar() {
                         )}
                     </NavLink>
                 ))}
+
+                {user?.perfil === 'ADMINISTRADOR' && (
+                    <NavLink
+                        to="/config/operadores"
+                        className={({ isActive }) =>
+                            `flex items-center gap-3 px-4 py-3 mx-2 my-1 font-lexend text-sm font-medium rounded-lg transition-all duration-200 ${isActive
+                                ? 'bg-secondary-container text-white shadow-lg shadow-red-900/20 active-scale'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`
+                        }
+                    >
+                        {({ isActive }) => (
+                            <>
+                                <span className={`material-symbols-outlined ${isActive ? 'fill' : ''}`}>admin_panel_settings</span>
+                                Operadores
+                            </>
+                        )}
+                    </NavLink>
+                )}
             </div>
 
             <div className="px-6 mt-auto flex flex-col gap-4">

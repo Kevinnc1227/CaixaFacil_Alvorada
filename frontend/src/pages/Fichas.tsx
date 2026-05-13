@@ -12,8 +12,10 @@ export default function Fichas() {
     const [filter, setFilter] = useState('Todas');
     const [showNovoCliente, setShowNovoCliente] = useState(false);
     const [showFechar, setShowFechar] = useState<Ficha | null>(null);
+    const [showExcluir, setShowExcluir] = useState<Ficha | null>(null);
     const [formaPgto, setFormaPgto] = useState('DINHEIRO');
     const [novoForm, setNovoForm] = useState({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' });
+    const [adminAuth, setAdminAuth] = useState({ email: '', password: '' });
 
     const { data: fichasData = [], isLoading } = useQuery({
         queryKey: ['fichas'],
@@ -30,6 +32,38 @@ export default function Fichas() {
         mutationFn: async () => { if (!showFechar) return; await api.post(`/fichas/fichas/${showFechar.id}/fechar`, { formaPagamento: formaPgto }); },
         onSuccess: () => { toast.success('Conta fechada!'); queryClient.invalidateQueries({ queryKey: ['fichas'] }); setShowFechar(null); },
         onError: (e: any) => toast.error(e.response?.data?.error || 'Não foi possível fechar.')
+        mutationFn: async () => {
+            if (!showFechar) return;
+            await api.post(`/fichas/fichas/${showFechar.id}/fechar`, { formaPagamento: formaPgto });
+        },
+        onSuccess: () => {
+            toast.success('Conta fechada e recebida!');
+            queryClient.invalidateQueries({ queryKey: ['fichas'] });
+            setShowFechar(null);
+        },
+        onError: (e: any) => toast.error(e.response?.data?.error || 'Não foi possível fechar a conta.')
+    });
+
+    const excluirMutation = useMutation({
+        mutationFn: async () => {
+            if (!showExcluir) return;
+            return api.delete(`/clientes/${showExcluir.clienteId}`, {
+                data: {
+                    adminEmail: adminAuth.email,
+                    adminPassword: adminAuth.password
+                }
+            });
+        },
+        onSuccess: () => {
+            toast.success('Cliente excluído permanentemente!');
+            queryClient.invalidateQueries({ queryKey: ['fichas'] });
+            setShowExcluir(null);
+            setAdminAuth({ email: '', password: '' });
+        },
+        onError: (e: any) => {
+            const msg = e.response?.data?.error || `Erro ${e.response?.status || 'desconhecido'}: Falha na autorização ou servidor.`;
+            toast.error(msg);
+        }
     });
 
     const filteredFichas = fichasData.filter((f: Ficha) => {
@@ -114,8 +148,24 @@ export default function Fichas() {
                                         {f.status === 'ABERTA' && (
                                             <button onClick={() => { setShowFechar(f); setFormaPgto('DINHEIRO'); }} className="cf-btn cf-btn-primary text-xs py-1.5 px-3 min-h-0 h-8">
                                                 RECEBER
+                                    <td className="p-4 text-center">
+                                        <div className="flex items-center justify-center gap-2">
+                                            {f.status === 'ABERTA' && (
+                                                <button
+                                                    onClick={() => { setShowFechar(f); setFormaPgto('DINHEIRO'); }}
+                                                    className="btn-primary text-xs py-1.5 px-3 bg-secondary hover:bg-secondary/90 shadow-sm"
+                                                >
+                                                    RECEBER & FECHAR
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => setShowExcluir(f)}
+                                                className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-all"
+                                                title="Excluir cliente (Requer Admin)"
+                                            >
+                                                <span className="material-symbols-outlined text-[20px]">delete_forever</span>
                                             </button>
-                                        )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -204,6 +254,57 @@ export default function Fichas() {
                             <button onClick={() => setShowFechar(null)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
                             <button onClick={() => fecharMutation.mutate()} disabled={fecharMutation.isPending} className="cf-btn cf-btn-primary flex-1">
                                 {fecharMutation.isPending ? 'Fechando...' : 'Confirmar Recebimento'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Exclusão com Aprovação ADM */}
+            {showExcluir && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-surface rounded-2xl border border-outline-variant shadow-2xl w-full max-w-sm">
+                        <div className="flex flex-col items-center p-md text-center">
+                            <div className="w-16 h-16 rounded-full bg-error-container text-error flex items-center justify-center mb-4">
+                                <span className="material-symbols-outlined text-[32px]">warning</span>
+                            </div>
+                            <h2 className="font-headline-sm text-on-surface">Excluir Cliente?</h2>
+                            <p className="text-sm text-on-surface-variant mt-2">
+                                Você está prestes a excluir <strong className="text-on-surface">{showExcluir.nome}</strong>. 
+                                Esta ação é irreversível e removerá todas as fichas e reservas associadas.
+                            </p>
+                        </div>
+                        <div className="p-md pt-0 flex flex-col gap-md">
+                            <div className="bg-surface-container-low p-md rounded-xl border border-outline-variant space-y-md">
+                                <p className="text-xs font-bold text-on-surface-variant uppercase text-center">Autorização Administrativa</p>
+                                <div className="flex flex-col gap-xs">
+                                    <input
+                                        className="input text-sm"
+                                        placeholder="E-mail do Administrador"
+                                        type="email"
+                                        value={adminAuth.email}
+                                        onChange={e => setAdminAuth(a => ({ ...a, email: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-xs">
+                                    <input
+                                        className="input text-sm"
+                                        placeholder="Senha"
+                                        type="password"
+                                        value={adminAuth.password}
+                                        onChange={e => setAdminAuth(a => ({ ...a, password: e.target.value }))}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex gap-md p-md border-t border-outline-variant">
+                            <button onClick={() => { setShowExcluir(null); setAdminAuth({ email: '', password: '' }); }} className="btn-secondary flex-1">Cancelar</button>
+                            <button
+                                onClick={() => excluirMutation.mutate()}
+                                disabled={!adminAuth.email || !adminAuth.password || excluirMutation.isPending}
+                                className="btn-primary flex-1 bg-error hover:bg-error-dark text-white disabled:opacity-50"
+                            >
+                                {excluirMutation.isPending ? 'Excluindo...' : 'Confirmar Exclusão'}
                             </button>
                         </div>
                     </div>

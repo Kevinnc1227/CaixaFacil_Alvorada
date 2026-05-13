@@ -23,24 +23,26 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
                 status: tipo === 'PAGAR_AGORA' ? 'PAGO' : 'LANCADO_FICHA',
                 total,
                 fichaId: tipo === 'LANCAR_FICHA' ? fichaId : null
-            }).returning();
+            }).returning().get();
 
             for (const item of itens) {
-                await tx.insert(itensPedido).values({
+                tx.insert(itensPedido).values({
                     pedidoId: novoPedido.id,
                     produtoId: item.produtoId,
                     quantidade: item.quantidade,
                     precoUnitario: item.precoUnitario
-                });
+                }).run();
 
                 // Decrementa estoque apenas de produto da mesma org (segurança)
                 const produtoDb = await tx.select().from(produtos)
                     .where(and(eq(produtos.id, item.produtoId), eq(produtos.organizacaoId, orgId)))
                     .get();
 
+                // Decrementar estoque do produto
+                const produtoDb = tx.select().from(produtos).where(eq(produtos.id, item.produtoId)).get();
                 if (produtoDb) {
                     const newQtd = Math.max(0, produtoDb.qtdEstoque - item.quantidade);
-                    await tx.update(produtos).set({ qtdEstoque: newQtd }).where(eq(produtos.id, produtoDb.id));
+                    tx.update(produtos).set({ qtdEstoque: newQtd }).where(eq(produtos.id, produtoDb.id)).run();
                 }
             }
 
@@ -52,6 +54,9 @@ export const createPedido = async (req: AuthRequest, res: Response): Promise<voi
                     await tx.update(fichas)
                         .set({ totalAcumulado: fichaDb.totalAcumulado + total })
                         .where(eq(fichas.id, fichaId));
+                const fichaDb = tx.select().from(fichas).where(eq(fichas.id, fichaId)).get();
+                if (fichaDb) {
+                    tx.update(fichas).set({ totalAcumulado: fichaDb.totalAcumulado + total }).where(eq(fichas.id, fichaId)).run();
                 }
             }
         });

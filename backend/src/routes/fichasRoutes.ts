@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listClientes, createCliente, getFichasByCliente, fecharFicha, createFicha, listTodasFichas } from '../controllers/fichasController';
+import { listClientes, createCliente, getFichasByCliente, fecharFicha, createFicha, listTodasFichas, deleteCliente } from '../controllers/fichasController';
 import { authenticate, requireRole } from '../middlewares/authMiddleware';
 
 const router = Router();
@@ -13,5 +13,8 @@ router.post('/:id/fichas', authenticate, createFicha); // Abre nova ficha pro cl
 
 // Apenas admin/suporte pode dar 'baixa' (receber dinheiro final e fechar a ficha) - Mudar se Operador tiver permissão de fechar conta
 router.post('/fichas/:id/fechar', authenticate, requireRole(['ADMINISTRADOR']), fecharFicha);
+
+// Exclusão de cliente (requer validação de admin no controller)
+router.delete('/:id', authenticate, deleteCliente);
 
 export default router;

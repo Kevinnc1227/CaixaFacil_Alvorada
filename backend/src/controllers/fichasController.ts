@@ -109,3 +109,66 @@ export const fecharFicha = async (req: AuthRequest, res: Response): Promise<void
         res.status(500).json({ error: 'Erro ao fechar ficha' });
     }
 };
+
+export const deleteCliente = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const clienteId = Number(req.params.id);
+        const { adminEmail, adminPassword } = req.body;
+
+        console.log(`[deleteCliente] Tentando excluir cliente ID: ${clienteId} por admin: ${adminEmail}`);
+
+        if (!adminEmail || !adminPassword) {
+            res.status(400).json({ error: 'Credenciais administrativas são necessárias para esta ação' });
+            return;
+        }
+
+        const admin = await db.select().from(usuarios)
+            .where(eq(usuarios.email, adminEmail))
+            .get();
+
+        if (!admin) {
+            console.warn(`[deleteCliente] Admin não encontrado: ${adminEmail}`);
+            res.status(403).json({ error: 'Administrador não encontrado.' });
+            return;
+        }
+
+        if (admin.perfil !== 'ADMINISTRADOR' || !admin.ativo) {
+            console.warn(`[deleteCliente] Usuário ${adminEmail} não tem permissão ou não está ativo.`);
+            res.status(403).json({ error: 'Acesso negado. Apenas administradores ativos podem excluir clientes.' });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(adminPassword, admin.senhaHash);
+        if (!isPasswordValid) {
+            console.warn(`[deleteCliente] Senha incorreta para admin: ${adminEmail}`);
+            res.status(401).json({ error: 'Senha administrativa incorreta' });
+            return;
+        }
+
+        db.transaction((tx) => {
+            const fichasCliente = tx.select().from(fichas).where(eq(fichas.clienteId, clienteId)).all();
+            const fichaIds = fichasCliente.map(f => f.id);
+
+            if (fichaIds.length > 0) {
+                const pedidosCliente = tx.select().from(pedidos).where(inArray(pedidos.fichaId, fichaIds)).all();
+                const pedidoIds = pedidosCliente.map(p => p.id);
+
+                if (pedidoIds.length > 0) {
+                    tx.delete(itensPedido).where(inArray(itensPedido.pedidoId, pedidoIds)).run();
+                    tx.delete(pedidos).where(inArray(pedidos.id, pedidoIds)).run();
+                }
+
+                tx.delete(fichas).where(eq(fichas.clienteId, clienteId)).run();
+            }
+
+            tx.delete(reservasCampo).where(eq(reservasCampo.clienteId, clienteId)).run();
+            tx.delete(clientes).where(eq(clientes.id, clienteId)).run();
+        });
+
+        console.log(`[deleteCliente] Cliente ${clienteId} excluído com sucesso.`);
+        res.json({ message: 'Cliente e todos os seus registros foram excluídos com sucesso' });
+    } catch (error) {
+        console.error('[deleteCliente] Erro fatal ao excluir cliente:', error);
+        res.status(500).json({ error: 'Erro interno ao processar a exclusão.' });
+    }
+};

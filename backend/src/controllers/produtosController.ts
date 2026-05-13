@@ -32,10 +32,20 @@ export const createProduto = async (req: AuthRequest, res: Response): Promise<vo
         const [result] = await db.insert(produtos).values({
             nome, categoria, precoVenda, qtdEstoque, qtdMinima,
             organizacaoId: orgId,
+        const { nome, categoria, precoVenda, precoCusto, qtdEstoque, qtdMinima } = req.body;
+
+        const result = await db.insert(produtos).values({
+            nome,
+            categoria,
+            precoVenda,
+            precoCusto: precoCusto ?? 0,
+            qtdEstoque,
+            qtdMinima,
         }).returning();
 
         res.status(201).json(result);
     } catch (error) {
+        console.error('Erro ao criar produto:', error);
         res.status(500).json({ error: 'Erro ao criar produto' });
     }
 };
@@ -49,11 +59,29 @@ export const updateProduto = async (req: AuthRequest, res: Response): Promise<vo
         const [result] = await db.update(produtos)
             .set({ nome, categoria, precoVenda, qtdMinima, ativo })
             .where(and(eq(produtos.id, id), eq(produtos.organizacaoId, orgId)))
+        const { nome, categoria, precoVenda, precoCusto, qtdMinima, ativo } = req.body;
+
+        const result = await db.update(produtos)
+            .set({ nome, categoria, precoVenda, precoCusto: precoCusto ?? 0, qtdMinima, ativo })
+            .where(eq(produtos.id, id))
             .returning();
 
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao atualizar produto' });
+    }
+};
+
+export const deleteProduto = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const id = Number(req.params.id);
+
+        await db.delete(produtos).where(eq(produtos.id, id));
+
+        res.json({ message: 'Produto excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        res.status(500).json({ error: 'Erro ao excluir produto' });
     }
 };
 
@@ -95,6 +123,18 @@ export const ajustarEstoque = async (req: AuthRequest, res: Response): Promise<v
                 organizacaoId: orgId,
             });
             await tx.update(produtos).set({ qtdEstoque: novaQtd }).where(eq(produtos.id, produtoId));
+        db.transaction((tx) => {
+            // Registrar log de auditoria
+            tx.insert(ajustesEstoque).values({
+                produtoId,
+                usuarioId,
+                quantidade,
+                tipo,
+                motivo
+            }).run();
+
+            // Atualizar no produto real
+            tx.update(produtos).set({ qtdEstoque: novaQtd }).where(eq(produtos.id, produtoId)).run();
         });
 
         res.json({ message: 'Estoque ajustado com sucesso', novoEstoque: novaQtd });

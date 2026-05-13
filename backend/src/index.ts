@@ -14,6 +14,9 @@ import usuariosRoutes from './routes/usuariosRoutes';
 import leadsRoutes from './routes/leadsRoutes';
 import adminRoutes from './routes/adminRoutes';
 import setupRoutes from './routes/setupRoutes';
+import reservasCampoRoutes from './routes/reservasCampoRoutes';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -39,6 +42,7 @@ app.use('/api/fichas', fichasRoutes);
 app.use('/api/caixa', caixasRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/reservas-campo', reservasCampoRoutes);
 
 app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'ok', service: 'K-HUB API v2.0 — Multi-Tenant' });

@@ -23,6 +23,9 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     if (!user || user.perfil !== 'SUPERADMIN') return <Navigate to="/login" replace />;
     return <>{children}</>;
 }
+import ReservaCampo from './pages/ReservaCampo';
+import OperatorManagement from './pages/OperatorManagement';
+import AdminRoute from './components/layout/AdminRoute';
 
 function App() {
     return (
@@ -58,6 +61,26 @@ function App() {
             </Routes>
         </BrowserRouter>
     );
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="/pdv" replace />} />
+          <Route path="pdv" element={<PDV />} />
+          <Route path="estoque" element={<Estoque />} />
+          <Route path="fichas" element={<Fichas />} />
+          <Route path="caixa" element={<Caixa />} />
+          <Route path="suporte" element={<Suporte />} />
+          <Route path="config">
+            <Route index element={<Config />} />
+            <Route path="operadores" element={
+              <AdminRoute>
+                <OperatorManagement />
+              </AdminRoute>
+            } />
+          </Route>
+          <Route path="reserva-campo" element={<ReservaCampo />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

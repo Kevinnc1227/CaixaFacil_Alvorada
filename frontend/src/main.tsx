@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import { ThemeProvider } from './context/ThemeContext'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './context/AuthContext.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +23,10 @@ createRoot(document.getElementById('root')!).render(
         <App />
         <Toaster position="top-right" toastOptions={{ className: 'font-sans text-sm bg-cf-surface text-cf-text border border-cf-border', duration: 4000 }} />
       </ThemeProvider>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+      <Toaster position="top-right" toastOptions={{ className: 'font-lexend text-sm' }} />
     </QueryClientProvider>
   </StrictMode>,
 )
