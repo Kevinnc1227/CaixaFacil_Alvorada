@@ -11,7 +11,8 @@ export default function Suporte() {
     const [newMessage, setNewMessage] = useState('');
     const [showNovoTicket, setShowNovoTicket] = useState(false);
     const [ticketForm, setTicketForm] = useState({ titulo: '', categoria: 'Bug', descricao: '' });
-    const currentUser = JSON.parse(localStorage.getItem('caixafacil_user') || localStorage.getItem('alvorada_user') || '{}');
+    // Eu busco o usuário logado usando a chave khub_user — padrão único do sistema
+    const currentUser = JSON.parse(localStorage.getItem('khub_user') || '{}');
 
     const { data: tickets = [] } = useQuery({
         queryKey: ['tickets'],
@@ -32,7 +33,12 @@ export default function Suporte() {
     });
 
     const sendMessageMutation = useMutation({
-        mutationFn: async () => { if (!newMessage.trim()) return; return api.post(`/tickets/${selecionado}/mensagens`, { mensagem: newMessage }); },
+        mutationFn: async () => { 
+            if (!newMessage.trim()) {
+                return;
+            }
+            return api.post(`/tickets/${selecionado}/mensagens`, { mensagem: newMessage }); 
+        },
         onSuccess: () => { setNewMessage(''); queryClient.invalidateQueries({ queryKey: ['tickets', selecionado, 'mensagens'] }); queryClient.invalidateQueries({ queryKey: ['tickets'] }); },
         onError: () => toast.error('Erro ao enviar mensagem.')
     });

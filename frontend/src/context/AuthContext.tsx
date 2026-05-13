@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 export type User = {
     id: number;
@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('alvorada_user');
+        // Eu busco o usuário salvo usando a chave khub_user — a mesma que o Login.tsx usa
+        const storedUser = localStorage.getItem('khub_user');
         if (storedUser) {
             try {
                 setUser(JSON.parse(storedUser));
@@ -30,8 +31,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const logout = () => {
-        localStorage.removeItem('alvorada_jwt');
-        localStorage.removeItem('alvorada_user');
+        // Eu limpo as duas chaves para garantir que nenhum token antigo fique para trás
+        localStorage.removeItem('khub_jwt');
+        localStorage.removeItem('khub_user');
         setUser(null);
     };
 

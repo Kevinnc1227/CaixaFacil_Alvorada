@@ -445,12 +445,11 @@ export default function AdminOrganizacoes() {
                                     </button>
                                 )}
                                 <button type="submit" disabled={saving} className="cf-btn cf-btn-primary uppercase font-black tracking-wide flex items-center gap-2 px-6">
-                                    {saving
-                                        ? 'Criando...'
-                                        : step === 1
-                                            ? (<>Próximo <ArrowRight className="w-4 h-4" /></>)
-                                            : (<>Criar Organização <Check className="w-4 h-4" /></>)
-                                    }
+                                    {(() => {
+                                        if (saving) return 'Criando...';
+                                        if (step === 1) return (<>Próximo <ArrowRight className="w-4 h-4" /></>);
+                                        return (<>Criar Organização <Check className="w-4 h-4" /></>);
+                                    })()}
                                 </button>
                             </div>
                         </form>

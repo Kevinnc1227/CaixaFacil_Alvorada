@@ -12,12 +12,18 @@ export const STORAGE_KEYS = {
     USER: 'khub_user',
 } as const;
 
-// Injeta o token JWT em todas as requisições autenticadas
+// Injeta o token JWT em todas as requisições autenticadas e garante o prefixo /api
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Garante que a requisição vá para /api se não for auth e não tiver o prefixo já
+    if (config.url && !config.url.startsWith('/api') && !config.url.startsWith('/auth')) {
+        config.url = `/api${config.url.startsWith('/') ? '' : '/'}${config.url}`;
+    }
+    
     return config;
 });
 
@@ -35,3 +41,7 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// Eu exporto também como named export para compatibilidade com
+// os módulos do origin/main que fazem `import { api } from '../api/api'`
+export { api };

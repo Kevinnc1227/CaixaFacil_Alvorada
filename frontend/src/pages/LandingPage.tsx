@@ -295,14 +295,21 @@ const Hero = () => (
 
 /* ─── Credibility Marquee ─── */
 const Credibility = () => {
-  const items = ['58 commits', '·', 'TypeScript 67%', '·', '4 Módulos', '·', 'SQLite', '·', 'React 19', '·', 'Vite', '·'];
+  const items = [
+    { id: 'c1', text: '58 commits' }, { id: 's1', text: '·' },
+    { id: 'c2', text: 'TypeScript 67%' }, { id: 's2', text: '·' },
+    { id: 'c3', text: '4 Módulos' }, { id: 's3', text: '·' },
+    { id: 'c4', text: 'SQLite' }, { id: 's4', text: '·' },
+    { id: 'c5', text: 'React 19' }, { id: 's5', text: '·' },
+    { id: 'c6', text: 'Vite' }, { id: 's6', text: '·' }
+  ];
   return (
     <div className="lp-cred">
       <div className="lp-cred-track">
         {[0, 1].map(set => (
           <div key={set} className="lp-cred-set">
-            {items.map((item, itemIdx) => (
-              <span key={`${set}-${itemIdx}`} className={item === '·' ? 'lp-cred-sep' : ''}>{item}</span>
+            {items.map((item) => (
+              <span key={`${set}-${item.id}`} className={item.text === '·' ? 'lp-cred-sep' : ''}>{item.text}</span>
             ))}
           </div>
         ))}
@@ -330,7 +337,7 @@ const PainSection = () => (
       Você conhece essa história?
     </motion.h2>
     <div className="lp-pain-grid">
-      {PAINS.map((p) => (
+      {PAINS.map((p, i) => (
         <motion.div
           key={p.num}
           className="lp-pain-card"
@@ -352,15 +359,15 @@ const PainSection = () => (
 /* ─── POS Mockup ─── */
 const POSMockup = () => {
   const [items, setItems] = useState([
-    { name: 'Refrigerante Lata', price: 6 },
-    { name: 'X-Tudo', price: 28 },
+    { id: 1, name: 'Refrigerante Lata', price: 6 },
+    { id: 2, name: 'X-Tudo', price: 28 },
   ]);
   useEffect(() => {
     const id = setInterval(() => {
       setItems(prev =>
         prev.length >= 4
-          ? [{ name: 'Refrigerante Lata', price: 6 }, { name: 'X-Tudo', price: 28 }]
-          : [...prev, { name: 'Porção Batata', price: 22 }]
+          ? [{ id: Date.now(), name: 'Refrigerante Lata', price: 6 }, { id: Date.now() + 1, name: 'X-Tudo', price: 28 }]
+          : [...prev, { id: Date.now(), name: 'Porção Batata', price: 22 }]
       );
     }, 2400);
     return () => clearInterval(id);
@@ -375,9 +382,9 @@ const POSMockup = () => {
       </div>
       <div className="lp-pos-body">
         <AnimatePresence initial={false}>
-          {items.map((item, i) => (
+          {items.map((item) => (
             <motion.div
-              key={`${i}-${item.name}`}
+              key={item.id}
               className="lp-pos-item"
               initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
@@ -559,7 +566,7 @@ const Estoque = () => (
           },
           { title: 'Auditoria Completa', desc: 'Todo ajuste manual gera um log imutável. Nada some sem rastro. Nada muda sem registro.' },
         ].map((col, i) => (
-          <motion.div key={i} className="lp-est-col"
+          <motion.div key={col.title} className="lp-est-col"
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}>
             <h3 className="lp-section-h3">{col.title}</h3>
@@ -591,7 +598,7 @@ const Seguranca = () => (
           { icon: Ticket, title: 'Suporte Integrado', desc: 'Sistema de chamados nativo. Tudo registrado dentro da plataforma.' },
           { icon: Shield, title: 'Dados Protegidos', desc: 'Autenticação com níveis de segurança e logs de sessão auditados.' },
         ].map((p, i) => (
-          <motion.div key={i} className="lp-seg-col"
+          <motion.div key={p.title} className="lp-seg-col"
             initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}>
             <div className="lp-seg-icon"><p.icon size={24} strokeWidth={1.5} /></div>
