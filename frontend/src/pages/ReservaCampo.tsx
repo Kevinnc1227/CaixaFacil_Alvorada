@@ -343,14 +343,14 @@ export default function ReservaCampo() {
                                         placeholder="Digite o nome do cliente..."
                                         value={novoClienteNome}
                                         onChange={e => setNovoClienteNome(e.target.value)}
-                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/50"
+                                        className="cf-input"
                                     />
                                 ) : (
                                     <select
                                         id="sel-cliente"
                                         value={form.clienteId}
                                         onChange={e => setForm(f => ({ ...f, clienteId: e.target.value }))}
-                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="cf-input"
                                     >
                                         <option value="">— Selecione um cliente —</option>
                                         {clientes.map(c => (
@@ -368,7 +368,7 @@ export default function ReservaCampo() {
                                     type="date"
                                     value={form.dataReserva}
                                     onChange={e => setForm(f => ({ ...f, dataReserva: e.target.value }))}
-                                    className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="cf-input"
                                 />
                             </div>
 
@@ -381,7 +381,7 @@ export default function ReservaCampo() {
                                         type="time"
                                         value={form.horaInicio}
                                         onChange={e => setForm(f => ({ ...f, horaInicio: e.target.value }))}
-                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="cf-input"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
@@ -391,7 +391,7 @@ export default function ReservaCampo() {
                                         type="time"
                                         value={form.horaFim}
                                         onChange={e => setForm(f => ({ ...f, horaFim: e.target.value }))}
-                                        className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="cf-input"
                                     />
                                 </div>
                             </div>
@@ -414,7 +414,7 @@ export default function ReservaCampo() {
                                     placeholder="0,00"
                                     value={form.valorTotal}
                                     onChange={e => setForm(f => ({ ...f, valorTotal: e.target.value }))}
-                                    className="bg-surface-variant border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="cf-input"
                                 />
                             </div>
 
