@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import api from '../api/api';
 
 // Aqui eu defino o tipo Ficha pra o TypeScript parar de me xingar e eu saber exatamente o que vem da API.
-type Ficha = { id: number; clienteId: number; nome: string; cpf: string; status: 'ABERTA' | 'PAGA'; totalAcumulado: number; };
+type Ficha = { id: number; clienteId: number; nome: string; cpf: string; telefone?: string; observacoes?: string; status: 'ABERTA' | 'PAGA'; totalAcumulado: number; };
 
 // Formas de pagamento aceitas na hora de fechar a ficha.
 const FORMAS = ['DINHEIRO', 'PIX', 'CARTAO'];
@@ -23,6 +23,12 @@ export default function Fichas() {
     const [showFechar, setShowFechar] = useState<Ficha | null>(null);
     const [formaPgto, setFormaPgto] = useState('DINHEIRO');
     
+    // Modais e formulários de edição e autorização admin
+    const [showEditCliente, setShowEditCliente] = useState<Ficha | null>(null);
+    const [editForm, setEditForm] = useState({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' });
+    const [showAdminAuth, setShowAdminAuth] = useState<{ action: 'EDIT' | 'DELETE', clienteId: number } | null>(null);
+    const [adminAuthForm, setAdminAuthForm] = useState({ email: '', password: '' });
+
     // Formulário do novo cliente
     const [novoForm, setNovoForm] = useState({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' });
 
@@ -45,6 +51,37 @@ export default function Fichas() {
             setNovoForm({ nomeCompleto: '', cpf: '', telefone: '', observacoes: '' }); 
         },
         onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao cadastrar.')
+    });
+
+    // Mutação pra editar cliente
+    const editClienteMutation = useMutation({
+        mutationFn: async () => api.put(`/fichas/${showAdminAuth?.clienteId}`, { 
+            ...editForm, 
+            adminEmail: adminAuthForm.email, 
+            adminPassword: adminAuthForm.password 
+        }),
+        onSuccess: () => {
+            toast.success('Cliente atualizado!');
+            queryClient.invalidateQueries({ queryKey: ['fichas'] });
+            setShowAdminAuth(null);
+            setShowEditCliente(null);
+            setAdminAuthForm({ email: '', password: '' });
+        },
+        onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao editar cliente.')
+    });
+
+    // Mutação pra excluir cliente
+    const deleteClienteMutation = useMutation({
+        mutationFn: async () => api.delete(`/fichas/${showAdminAuth?.clienteId}`, {
+            data: { adminEmail: adminAuthForm.email, adminPassword: adminAuthForm.password }
+        }),
+        onSuccess: () => {
+            toast.success('Cliente excluído!');
+            queryClient.invalidateQueries({ queryKey: ['fichas'] });
+            setShowAdminAuth(null);
+            setAdminAuthForm({ email: '', password: '' });
+        },
+        onError: (e: any) => toast.error(e.response?.data?.error || 'Erro ao excluir cliente.')
     });
 
     // Mutação pra fechar a conta do caboclo.
@@ -159,12 +196,28 @@ export default function Fichas() {
                                     </td>
                                     <td className="text-right"><span className="cf-price">{(f.totalAcumulado || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></td>
                                     <td className="text-center">
-                                        {/* Só posso receber de quem tá devendo (ABERTA) */}
-                                        {f.status === 'ABERTA' && (
-                                            <button onClick={() => { setShowFechar(f); setFormaPgto('DINHEIRO'); }} className="cf-btn cf-btn-primary text-xs py-1.5 px-3 min-h-0 h-8">
-                                                RECEBER
+                                        <div className="flex items-center justify-center gap-2">
+                                            <button onClick={() => {
+                                                setShowEditCliente(f);
+                                                setEditForm({ nomeCompleto: f.nome, cpf: f.cpf || '', telefone: f.telefone || '', observacoes: f.observacoes || '' });
+                                            }} className="cf-btn cf-btn-ghost text-xs py-1.5 px-2 min-h-0 h-8" title="Editar Cliente">
+                                                <span className="material-symbols-outlined text-[16px]">edit</span>
                                             </button>
-                                        )}
+                                            
+                                            {f.status === 'ABERTA' && (
+                                                <button onClick={() => { setShowFechar(f); setFormaPgto('DINHEIRO'); }} className="cf-btn cf-btn-primary text-xs py-1.5 px-3 min-h-0 h-8">
+                                                    RECEBER
+                                                </button>
+                                            )}
+
+                                            <button onClick={() => {
+                                                if (confirm('Tem certeza que deseja excluir este cliente? Toda a movimentação será apagada e essa ação não pode ser desfeita.')) {
+                                                    setShowAdminAuth({ action: 'DELETE', clienteId: f.clienteId });
+                                                }
+                                            }} className="cf-btn cf-btn-danger text-xs py-1.5 px-2 min-h-0 h-8" title="Excluir Cliente">
+                                                <span className="material-symbols-outlined text-[16px]">delete</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -261,7 +314,94 @@ export default function Fichas() {
                     </div>
                 </div>
             )}
+            {/* Modal Editar Cliente */}
+            {showEditCliente && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="cf-card-elevated w-full max-w-md overflow-hidden relative">
+                        <div className="h-1 w-full bg-cf-accent absolute top-0 left-0" />
+                        <div className="flex items-center justify-between p-5 border-b border-cf-border">
+                            <div>
+                                <h2 className="font-sans text-xl font-bold text-cf-text tracking-tight">Editar Cliente</h2>
+                                <p className="text-xs text-cf-muted font-mono tracking-wider uppercase mt-1">Atualizar dados cadastrais</p>
+                            </div>
+                            <button onClick={() => setShowEditCliente(null)} className="text-cf-muted hover:text-cf-red transition-colors"><span className="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div className="p-5 flex flex-col gap-4">
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="edit-nome" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Nome Completo *</label>
+                                <input id="edit-nome" className="cf-input" placeholder="Ex: João da Silva" value={editForm.nomeCompleto} onChange={e => setEditForm(f => ({ ...f, nomeCompleto: e.target.value }))} autoFocus />
+                            </div>
+                            <div className="flex gap-4">
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <label htmlFor="edit-cpf" className="text-xs font-mono uppercase tracking-widest text-cf-muted">CPF / Doc</label>
+                                    <input id="edit-cpf" className="cf-input" placeholder="000.000.000-00" value={editForm.cpf} onChange={e => setEditForm(f => ({ ...f, cpf: e.target.value }))} />
+                                </div>
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <label htmlFor="edit-telefone" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Telefone</label>
+                                    <input id="edit-telefone" className="cf-input" placeholder="(47) 99999-9999" value={editForm.telefone} onChange={e => setEditForm(f => ({ ...f, telefone: e.target.value }))} />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="edit-obs" className="text-xs font-mono uppercase tracking-widest text-cf-muted">Observações</label>
+                                <textarea id="edit-obs" className="cf-input h-20 resize-none" placeholder="Observações opcionais..." value={editForm.observacoes} onChange={e => setEditForm(f => ({ ...f, observacoes: e.target.value }))} />
+                            </div>
+                        </div>
+                        <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">
+                            <button onClick={() => setShowEditCliente(null)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
+                            <button onClick={() => {
+                                setShowAdminAuth({ action: 'EDIT', clienteId: showEditCliente.clienteId });
+                            }} disabled={!editForm.nomeCompleto} className="cf-btn cf-btn-primary flex-1">
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Autorização de Admin */}
+            {showAdminAuth && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+                    <div className="cf-card-elevated w-full max-w-sm overflow-hidden relative">
+                        <div className={`h-1 w-full ${showAdminAuth.action === 'DELETE' ? 'bg-cf-red' : 'bg-cf-accent'} absolute top-0 left-0`} />
+                        <div className="flex items-center justify-between p-5 border-b border-cf-border">
+                            <div>
+                                <h2 className="font-sans text-xl font-bold text-cf-text tracking-tight">Autorização</h2>
+                                <p className="text-xs text-cf-muted font-mono tracking-wider uppercase mt-1">
+                                    {showAdminAuth.action === 'DELETE' ? 'Excluir Cliente' : 'Editar Cliente'}
+                                </p>
+                            </div>
+                            <button onClick={() => setShowAdminAuth(null)} className="text-cf-muted hover:text-cf-red transition-colors"><span className="material-symbols-outlined">close</span></button>
+                        </div>
+                        <div className="p-5 flex flex-col gap-4">
+                            <div className={`p-4 rounded-xl border ${showAdminAuth.action === 'DELETE' ? 'bg-cf-red/10 border-cf-red/20 text-cf-red' : 'bg-cf-surface-high border-cf-border text-cf-text'} text-sm`}>
+                                <span className="material-symbols-outlined text-[20px] mb-2 block">
+                                    {showAdminAuth.action === 'DELETE' ? 'warning' : 'admin_panel_settings'}
+                                </span>
+                                {showAdminAuth.action === 'DELETE' 
+                                    ? 'Atenção! Esta ação apagará permanentemente o cliente e todos os seus históricos (pedidos, fichas). Confirme suas credenciais de administrador.'
+                                    : 'A edição de clientes exige permissão de administrador. Por favor, confirme suas credenciais.'}
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">E-mail do Administrador</label>
+                                <input type="email" className="cf-input" value={adminAuthForm.email} onChange={e => setAdminAuthForm(f => ({ ...f, email: e.target.value }))} autoFocus />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs font-mono uppercase tracking-widest text-cf-muted">Senha</label>
+                                <input type="password" className="cf-input" value={adminAuthForm.password} onChange={e => setAdminAuthForm(f => ({ ...f, password: e.target.value }))} />
+                            </div>
+                        </div>
+                        <div className="flex gap-3 p-5 border-t border-cf-border bg-cf-surface-high/50">
+                            <button onClick={() => setShowAdminAuth(null)} className="cf-btn cf-btn-ghost flex-1">Cancelar</button>
+                            <button 
+                                onClick={() => showAdminAuth.action === 'DELETE' ? deleteClienteMutation.mutate() : editClienteMutation.mutate()} 
+                                disabled={!adminAuthForm.email || !adminAuthForm.password || deleteClienteMutation.isPending || editClienteMutation.isPending} 
+                                className={`cf-btn flex-1 ${showAdminAuth.action === 'DELETE' ? 'cf-btn-danger' : 'cf-btn-primary'}`}>
+                                {(deleteClienteMutation.isPending || editClienteMutation.isPending) ? 'Processando...' : 'Confirmar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
-
