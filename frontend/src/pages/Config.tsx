@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../context/ThemeContext';
 import api from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
 const THEMES = [
     { id: 'amber-dark', label: 'Âmbar', desc: 'Padrão K-HUB', color: '#D4A853' },
@@ -12,6 +13,7 @@ const THEMES = [
 
 export default function Config() {
     const { theme, setTheme } = useTheme();
+    const navigate = useNavigate();
 
     const { data: usuarios = [], isLoading } = useQuery({
         queryKey: ['usuarios'],
@@ -70,7 +72,7 @@ export default function Config() {
                             <p className="text-xs text-cf-muted font-mono mt-0.5">Gerencie o acesso ao sistema</p>
                         </div>
                     </div>
-                    <button className="cf-btn cf-btn-ghost text-xs py-2 px-3 min-h-0 h-8">
+                    <button onClick={() => navigate('/config/operadores')} className="cf-btn cf-btn-ghost text-xs py-2 px-3 min-h-0 h-8">
                         <span className="material-symbols-outlined text-[16px]">person_add</span>
                         ADICIONAR
                     </button>
