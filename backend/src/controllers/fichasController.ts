@@ -29,6 +29,8 @@ export const listTodasFichas = async (req: AuthRequest, res: Response): Promise<
             clienteId: clientes.id,
             nome: clientes.nomeCompleto,
             cpf: clientes.cpf,
+            telefone: clientes.telefone,
+            observacoes: clientes.observacoes,
             status: fichas.status,
             totalAcumulado: fichas.totalAcumulado
         }).from(fichas)
@@ -117,6 +119,46 @@ export const fecharFicha = async (req: AuthRequest, res: Response): Promise<void
         res.json(fichaAtualizada);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao fechar ficha' });
+    }
+};
+
+// Atualiza os dados de um cliente exigindo confirmação de credenciais do admin
+export const updateCliente = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        const clienteId = Number(req.params.id);
+        const { nomeCompleto, cpf, telefone, observacoes, adminEmail, adminPassword } = req.body;
+
+        if (!adminEmail || !adminPassword) {
+            res.status(400).json({ error: 'Credenciais administrativas são necessárias para esta ação' });
+            return;
+        }
+
+        const admin = await db.select().from(usuarios)
+            .where(eq(usuarios.email, adminEmail))
+            .get();
+
+        if (!admin || admin.perfil !== 'ADMINISTRADOR' || !admin.ativo) {
+            res.status(403).json({ error: 'Acesso negado. Apenas administradores ativos podem editar clientes.' });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(adminPassword, admin.senhaHash);
+        if (!isPasswordValid) {
+            res.status(401).json({ error: 'Senha administrativa incorreta' });
+            return;
+        }
+
+        const [clienteAtualizado] = await db.update(clientes).set({
+            nomeCompleto,
+            cpf,
+            telefone,
+            observacoes
+        }).where(eq(clientes.id, clienteId)).returning();
+
+        res.json({ message: 'Cliente atualizado com sucesso', cliente: clienteAtualizado });
+    } catch (error) {
+        console.error('[updateCliente] Erro ao editar cliente:', error);
+        res.status(500).json({ error: 'Erro interno ao editar cliente.' });
     }
 };
 
