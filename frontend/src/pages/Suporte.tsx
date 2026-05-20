@@ -11,8 +11,8 @@ export default function Suporte() {
     const [newMessage, setNewMessage] = useState('');
     const [showNovoTicket, setShowNovoTicket] = useState(false);
     const [ticketForm, setTicketForm] = useState({ titulo: '', categoria: 'Bug', descricao: '' });
-    // Eu busco o usuário logado usando a chave khub_user — padrão único do sistema
     const currentUser = JSON.parse(localStorage.getItem('khub_user') || '{}');
+    const isSupport = currentUser?.perfil === 'SUPORTE' || currentUser?.perfil === 'SUPERADMIN';
 
     const { data: tickets = [] } = useQuery({
         queryKey: ['tickets'],
@@ -78,10 +78,16 @@ export default function Suporte() {
                         </div>
                     ) : tickets.map((t: any) => (
                         <button key={t.id} onClick={() => setSelecionado(t.id)} className={`w-full text-left p-4 border-b border-cf-border/50 transition-all ${selecionado === t.id ? 'bg-cf-surface-high border-l-2 border-l-cf-accent' : 'hover:bg-cf-surface-high/50'}`}>
-                            <div className="flex justify-between items-start gap-2 mb-2">
+                            <div className="flex justify-between items-start gap-2 mb-1">
                                 <span className="font-medium text-cf-text text-sm line-clamp-1 flex-1">{t.titulo}</span>
                                 <span className="text-[10px] text-cf-muted font-mono flex-shrink-0">#{t.id}</span>
                             </div>
+                            {isSupport && t.usuarioNome && (
+                                <div className="text-[10px] text-cf-accent font-mono mb-2 flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-[12px] opacity-75">person</span>
+                                    <span className="line-clamp-1">{t.usuarioNome} ({t.usuarioPerfil})</span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-2">
                                 <span className={statusBadge(t.status)}>{t.status?.replace('_', ' ')}</span>
                                 <span className="text-[10px] text-cf-muted">{t.categoria}</span>
@@ -106,6 +112,11 @@ export default function Suporte() {
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className={statusBadge(selectedTicket?.status)}>{selectedTicket?.status?.replace('_', ' ')}</span>
                                     <span className="text-xs text-cf-muted font-mono">#{selecionado} · {selectedTicket?.categoria}</span>
+                                    {isSupport && selectedTicket?.usuarioNome && (
+                                        <span className="text-xs text-cf-accent font-mono ml-1">
+                                            · por: {selectedTicket.usuarioNome} ({selectedTicket.usuarioPerfil})
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             {selectedTicket?.status !== 'RESOLVIDO' && selecionado !== null && (
@@ -124,10 +135,18 @@ export default function Suporte() {
                                 </div>
                             ) : messages.map((m: any) => {
                                 const isMe = m.autorId === currentUser?.id;
+                                let displayName = 'Suporte K-HUB';
+                                if (isMe) {
+                                    displayName = 'Você';
+                                } else if (m.autorPerfil === 'SUPORTE' || m.autorPerfil === 'SUPERADMIN') {
+                                    displayName = 'Suporte K-HUB';
+                                } else {
+                                    displayName = `${m.autorNome || 'Usuário'} (${m.autorPerfil || 'Cliente'})`;
+                                }
                                 return (
                                     <div key={m.id} className={`flex flex-col gap-1 max-w-[75%] ${isMe ? '' : 'items-end ml-auto'}`}>
                                         <span className={`text-[10px] font-mono font-bold uppercase tracking-widest ${isMe ? 'text-cf-muted ml-1' : 'text-cf-accent mr-1'}`}>
-                                            {isMe ? (currentUser?.nome || 'Você') : 'Suporte K-HUB'}
+                                            {displayName}
                                         </span>
                                         <div className={`p-3 text-sm rounded-xl leading-relaxed ${isMe
                                             ? 'bg-cf-surface-high border border-cf-border rounded-tl-none text-cf-text'
