@@ -169,4 +169,6 @@ export const reservasCampo = sqliteTable('reservas_campo', {
     ticketId: integer('ticket_id').references(() => tickets.id),   // OneToOne — criado automaticamente
     usuarioId: integer('usuario_id').notNull().references(() => usuarios.id),
     criadoEm: integer('criado_em', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+    atualizadoPor: integer('atualizado_por').references(() => usuarios.id),
+    atualizadoEm: integer('atualizado_em', { mode: 'timestamp' }),
 });
