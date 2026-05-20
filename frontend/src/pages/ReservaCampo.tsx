@@ -24,6 +24,10 @@ interface Reserva {
     ticketId: number | null;
     usuarioId: number;
     criadoEm: string;
+    atualizadoPor?: number | null;
+    atualizadoEm?: string | null;
+    criadorNome?: string | null;
+    atualizadorNome?: string | null;
 }
 
 // Isso aqui é um mapinha pra facilitar a renderização visual dos status.
@@ -53,6 +57,15 @@ export default function ReservaCampo() {
         horaInicio: '08:00',
         horaFim: '09:00',
         valorTotal: '',
+    });
+
+    // Estados do modal de edição e auditoria
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [reservaParaEditar, setReservaParaEditar] = useState<Reserva | null>(null);
+    const [editForm, setEditForm] = useState({
+        dataReserva: '',
+        horaInicio: '',
+        horaFim: '',
     });
 
     // ── Queries ──
@@ -109,6 +122,27 @@ export default function ReservaCampo() {
         },
         onError: (err: any) => {
             toast.error(err?.response?.data?.error || err.message || 'Erro ao criar reserva');
+        },
+    });
+
+    // ── Mutation: editar horário da reserva ──
+    const editMutation = useMutation({
+        mutationFn: async () => {
+            if (!reservaParaEditar) return;
+            return api.patch(`/reservas-campo/${reservaParaEditar.id}`, {
+                dataReserva: editForm.dataReserva,
+                horaInicio: editForm.horaInicio,
+                horaFim: editForm.horaFim,
+            });
+        },
+        onSuccess: () => {
+            toast.success('Horário da reserva atualizado!');
+            queryClient.invalidateQueries({ queryKey: ['reservasCampo'] });
+            setShowEditModal(false);
+            setReservaParaEditar(null);
+        },
+        onError: (err: any) => {
+            toast.error(err?.response?.data?.error || err.message || 'Erro ao atualizar horário');
         },
     });
 
@@ -263,25 +297,45 @@ export default function ReservaCampo() {
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
-                                                {/* Só libero os botões de ação se a reserva tiver CONFIRMADA */}
-                                                {r.status === 'CONFIRMADA' && (
-                                                    <div className="flex gap-1">
-                                                        <button
-                                                            onClick={() => statusMutation.mutate({ id: r.id, status: 'CONCLUIDA' })}
-                                                            className="text-xs px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                                            title="Marcar como Concluída"
-                                                        >
-                                                            Concluir
-                                                        </button>
-                                                        <button
-                                                            onClick={() => statusMutation.mutate({ id: r.id, status: 'CANCELADA' })}
-                                                            className="text-xs px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-                                                            title="Cancelar Reserva"
-                                                        >
-                                                            Cancelar
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                <div className="flex items-center gap-1">
+                                                    {/* Botão de Ver Detalhes / Lápis */}
+                                                    <button
+                                                        onClick={() => {
+                                                            setReservaParaEditar(r);
+                                                            setEditForm({
+                                                                dataReserva: r.dataReserva,
+                                                                horaInicio: r.horaInicio,
+                                                                horaFim: r.horaFim,
+                                                            });
+                                                            setShowEditModal(true);
+                                                        }}
+                                                        className="text-xs px-2 py-1 rounded bg-sky-400/10 text-sky-400 hover:bg-sky-400/20 transition-colors flex items-center gap-1"
+                                                        title="Ver Detalhes / Editar Horário"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[14px]">edit</span>
+                                                        Editar
+                                                    </button>
+
+                                                    {/* Só libero os botões de ação se a reserva tiver CONFIRMADA */}
+                                                    {r.status === 'CONFIRMADA' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => statusMutation.mutate({ id: r.id, status: 'CONCLUIDA' })}
+                                                                className="text-xs px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                                                title="Marcar como Concluída"
+                                                            >
+                                                                Concluir
+                                                            </button>
+                                                            <button
+                                                                onClick={() => statusMutation.mutate({ id: r.id, status: 'CANCELADA' })}
+                                                                className="text-xs px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                                                title="Cancelar Reserva"
+                                                            >
+                                                                Cancelar
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     );
@@ -439,6 +493,149 @@ export default function ReservaCampo() {
                                         <><span className="material-symbols-outlined text-[18px]">check</span> Confirmar Reserva</>
                                     )}
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Modal Editar/Detalhes Reserva ── */}
+            {showEditModal && reservaParaEditar && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-md border border-outline-variant animate-in fade-in zoom-in-95 duration-200">
+
+                        {/* Header modal */}
+                        <div className="flex items-center justify-between p-6 border-b border-outline-variant">
+                            <div className="flex items-center gap-3">
+                                <span className="material-symbols-outlined text-sky-400 text-2xl">info</span>
+                                <h2 className="font-display-xs text-on-surface">Detalhes da Reserva #{reservaParaEditar.id}</h2>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setReservaParaEditar(null);
+                                }}
+                                className="text-on-surface-variant hover:text-on-surface transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Informações Gerais */}
+                        <div className="p-6 pb-2 flex flex-col gap-3">
+                            <div className="grid grid-cols-2 gap-2 text-xs border-b border-outline-variant pb-3">
+                                <div>
+                                    <span className="text-on-surface-variant block font-semibold uppercase">Cliente</span>
+                                    <span className="text-on-surface text-sm font-medium">{reservaParaEditar.nomeCliente}</span>
+                                </div>
+                                <div>
+                                    <span className="text-on-surface-variant block font-semibold uppercase">Valor Total</span>
+                                    <span className="text-on-surface text-sm font-semibold">
+                                        {reservaParaEditar.valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Informações de Autoria/Histórico */}
+                            <div className="flex flex-col gap-2 bg-on-surface/5 rounded-lg p-3 text-xs text-on-surface-variant border border-outline-variant/30">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="material-symbols-outlined text-[16px] text-emerald-400">person</span>
+                                    <span>Agendado por: <strong className="text-on-surface">{reservaParaEditar.criadorNome || 'Sistema'}</strong></span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-[10px] text-on-surface-variant/80 ml-5 -mt-1.5 font-mono">
+                                    <span>em {new Date(reservaParaEditar.criadoEm).toLocaleString('pt-BR')}</span>
+                                </div>
+
+                                {reservaParaEditar.atualizadorNome && (
+                                    <>
+                                        <div className="flex items-center gap-1.5 border-t border-outline-variant/20 pt-2 mt-1">
+                                            <span className="material-symbols-outlined text-[16px] text-amber-400">edit_note</span>
+                                            <span>Última alteração por: <strong className="text-on-surface">{reservaParaEditar.atualizadorNome}</strong></span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-[10px] text-on-surface-variant/80 ml-5 -mt-1.5 font-mono">
+                                            <span>em {reservaParaEditar.atualizadoEm ? new Date(reservaParaEditar.atualizadoEm).toLocaleString('pt-BR') : '—'}</span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Formulário de Edição */}
+                        <div className="p-6 pt-2 flex flex-col gap-4">
+                            {reservaParaEditar.status !== 'CONFIRMADA' && reservaParaEditar.status !== 'PENDENTE' ? (
+                                <div className="flex items-start gap-2 bg-amber-400/10 border border-amber-400/20 rounded-lg p-3 text-amber-400 text-xs">
+                                    <span className="material-symbols-outlined text-[16px] mt-0.5">warning</span>
+                                    <span>Esta reserva já está <strong>{STATUS_META[reservaParaEditar.status]?.label || reservaParaEditar.status}</strong>. O horário não pode mais ser alterado.</span>
+                                </div>
+                            ) : null}
+
+                            {/* Data */}
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-on-surface-variant uppercase">Data da Reserva</label>
+                                <input
+                                    type="date"
+                                    disabled={reservaParaEditar.status !== 'CONFIRMADA' && reservaParaEditar.status !== 'PENDENTE'}
+                                    value={editForm.dataReserva}
+                                    onChange={e => setEditForm(f => ({ ...f, dataReserva: e.target.value }))}
+                                    className="cf-input disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
+                            </div>
+
+                            {/* Horários */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface-variant uppercase">Hora Início</label>
+                                    <input
+                                        type="time"
+                                        disabled={reservaParaEditar.status !== 'CONFIRMADA' && reservaParaEditar.status !== 'PENDENTE'}
+                                        value={editForm.horaInicio}
+                                        onChange={e => setEditForm(f => ({ ...f, horaInicio: e.target.value }))}
+                                        className="cf-input disabled:opacity-50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-on-surface-variant uppercase">Hora Fim</label>
+                                    <input
+                                        type="time"
+                                        disabled={reservaParaEditar.status !== 'CONFIRMADA' && reservaParaEditar.status !== 'PENDENTE'}
+                                        value={editForm.horaFim}
+                                        onChange={e => setEditForm(f => ({ ...f, horaFim: e.target.value }))}
+                                        className="cf-input disabled:opacity-50 disabled:cursor-not-allowed"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Duração calculada */}
+                            {editForm.horaInicio && editForm.horaFim && (
+                                <p className="text-xs text-on-surface-variant -mt-2">
+                                    ⏱ Nova duração: <strong className="text-on-surface">{calcDuration(editForm.horaInicio, editForm.horaFim)}</strong>
+                                </p>
+                            )}
+
+                            {/* Botões */}
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    onClick={() => {
+                                        setShowEditModal(false);
+                                        setReservaParaEditar(null);
+                                    }}
+                                    className="flex-1 py-2 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-on-surface/5 text-sm transition-colors"
+                                >
+                                    Fechar
+                                </button>
+                                {(reservaParaEditar.status === 'CONFIRMADA' || reservaParaEditar.status === 'PENDENTE') && (
+                                    <button
+                                        disabled={!editForm.dataReserva || !editForm.horaInicio || !editForm.horaFim || editMutation.isPending}
+                                        onClick={() => editMutation.mutate()}
+                                        className="flex-1 py-2 rounded-lg bg-sky-500 text-white font-semibold text-sm hover:bg-sky-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        {editMutation.isPending ? (
+                                            <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Gravando...</>
+                                        ) : (
+                                            <><span className="material-symbols-outlined text-[18px]">save</span> Salvar Alterações</>
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
